@@ -96,12 +96,22 @@ NotesMarkdownFileEditorWindowBase >> defaultFolderPath: anObject [
 	defaultFolderPath := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> hasUnsavedContent [
+	"comment stating purpose of message"
+
+ ^ text hasUnacceptedEdits .
+]
+
 { #category : #initialization }
 NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 	"comment stating purpose of message"
 
 	text := TextModel new.
+
+	self askOkToClose: false.
 	self focusOrder add: text.
+	lineNumbersVisible := false.
 ]
 
 { #category : #'as yet unclassified' }
