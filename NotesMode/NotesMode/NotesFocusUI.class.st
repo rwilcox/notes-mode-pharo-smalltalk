@@ -51,7 +51,11 @@ NotesFocusUI >> sentFocusContentsToParent [
 	"comment stating purpose of message"
 
 self text accept.
-	self parentNotesUI appendText: (self text getText string). "cast it to a string, not text, to remove formatting. RPW 07/27/2019"
+
+self parentNotesUI ifNotNil: [ 
+	self parentNotesUI appendText: (self text getText string). 
+	"cast it to a string, not text, to remove formatting. RPW 07/27/2019"
+	].
 ]
 
 { #category : #accessing }
