@@ -20,20 +20,16 @@ NotesUI class >> defaultSpec [
 	rightSidebarLayoutSpec := SpecLayout composed.
 	calendarPickerLayoutSpec := SpecLayout composed.
 
-	calendarPickerLayoutSpec
-		newRow: [ :c | 
-			c
-				add: #calendarNavigator;
-				add: #entryPeekText ].
+calendarPickerLayoutSpec newRow: [ :c |
+	c add: #calendarNavigator;
+	add: #entryPeekText
+	 ].
 
 	rightSidebarLayoutSpec
 		newColumn: [ :c | 
 			c
 				add: #wikiWordsList;
-				addHSplitter;
-				"H splitter doesn't let you get smaller than the height of the calendar, 
-				but whatever, it's an improvement. WD-rpw 01-31-2020"
-					add: calendarPickerLayoutSpec ].
+				add: calendarPickerLayoutSpec  ].
 
 	bodyLayoutSpec
 		newRow: [ :c | 
@@ -227,7 +223,7 @@ NotesUI >> initializeWidgets [
 	
 ]
 
-{ #category : #'acessing text' }
+{ #category : #'UI adaptors' }
 NotesUI >> insertStringAtCursor: string [
 	"comment stating purpose of message"
 
@@ -256,22 +252,19 @@ NotesUI >> insertSubMenu [
 	^ MenuModel new addGroup: [ :group |
 		group addItem: [ :item |
 			item name: 'Work Log';
-			action: [ self insertStringAtCursor: self templateWorkLogEntry  ].
-			 ].
+			action: [ self insertStringAtCursor: (SnippetsCollection new worklogSnippet ) ] ].
 		
 		group addItem: [ :item |
 			item name: 'Meeting';
-			action: [ self insertStringAtCursor: self templateStringMeetingEntity  ].
-			 ]	.
+			action: [ self insertStringAtCursor: (SnippetsCollection new meetingSnippet) ]	].
 		group addItem: [ :item |
 			item name: 'TODO';
 			action: [ self insertStringAtCursor: '- [TODO]: ' ] ].
-		
-		 ].
-	
+		].
+	  
 ]
 
-{ #category : #'UI Builder' }
+{ #category : #'as yet unclassified' }
 NotesUI >> listSubMenu [
 	^ MenuModel new addGroup: [ :group |
 		group addItem: [ :item |
@@ -320,22 +313,6 @@ NotesUI >> spawnFocusWindow [
 	f parentNotesUI: self.
 	f openWithSpec.
 	
-]
-
-{ #category : #'static built in templates' }
-NotesUI >> templateStringMeetingEntity [
-	"comment stating purpose of message"
-
-	| temporary variable names |
-
-	^ '### - [MEETING]: '
-]
-
-{ #category : #'static built in templates' }
-NotesUI >> templateWorkLogEntry [
-	"comment stating purpose of message"
-
-	^  (Date today mmddyyyy , String cr, '=================================', String cr, String cr, 'Notes', String cr, '-------------------------------------', String cr, String cr , String cr, 'Meetings', String cr, '-------------------------------------', String cr, String cr, String cr, 'In Progress', String cr, '---------------------------------------------', String cr, String cr, String cr, 'TODOs', String cr, '-------------------------------------', String cr, String cr, String cr, 'Questions and Answers', String cr, '-------------------------------------', String cr, String cr, String cr, 'Standup Status For Tomorrow', String cr, '-------------------------------------', String cr, String cr, String cr)
 ]
 
 { #category : #accessing }

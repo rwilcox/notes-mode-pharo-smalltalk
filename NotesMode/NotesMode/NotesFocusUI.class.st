@@ -23,11 +23,6 @@ NotesFocusUI class >> defaultSpec [
 		^ bodyLayoutSpec .
 ]
 
-{ #category : #example }
-NotesFocusUI class >> example [
-	^ self new openWithSpec.
-]
-
 { #category : #initialization }
 NotesFocusUI >> initializeWidgets [
 	"comment stating purpose of message"
@@ -56,11 +51,7 @@ NotesFocusUI >> sentFocusContentsToParent [
 	"comment stating purpose of message"
 
 self text accept.
-
-self parentNotesUI ifNotNil: [ 
-	self parentNotesUI appendText: (self text getText string). 
-	"cast it to a string, not text, to remove formatting. RPW 07/27/2019"
-	].
+	self parentNotesUI appendText: (self text getText string). "cast it to a string, not text, to remove formatting. RPW 07/27/2019"
 ]
 
 { #category : #accessing }

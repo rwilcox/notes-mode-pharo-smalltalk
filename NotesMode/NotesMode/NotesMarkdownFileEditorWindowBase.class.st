@@ -32,66 +32,48 @@ Class {
 		'openFileFileReference',
 		'text',
 		'defaultFileName',
-		'defaultFolderPath',
-		'lineNumbersVisible'
+		'defaultFolderPath'
 	],
 	#category : #NotesMode
 }
 
-{ #category : #'as yet unclassified' }
-NotesMarkdownFileEditorWindowBase >> acceptTextEdits [
-	"comment stating purpose of message"
-
-	text accept.
-]
-
 { #category : #adding }
 NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 	group
-		addItem: [ :item | 
-			item
-				name: 'Line#s';
-				description: 'Line#s';
-				icon: Smalltalk ui icons repairIcon;
-				action: [ 
-					lineNumbersVisible ifTrue: [ self turnOffLineNumbers  ] ifFalse: [ self turnOnLineNumbers ] 
-					
-					 ] ].
-	group
-		addItem: [ :item | 
-			item
-				name: 'Find';
-				description: 'Find';
-				icon: Smalltalk ui icons smallQAIcon;
-				action: [ self openFindDialog ] ].
-	group
-		addItem: [ :item | 
-			item
-				name: 'Open...';
-				description: 'Open';
-				icon: Smalltalk ui icons openIcon;
-				action: [ self openFileFromDialog ] ].
-	group
-		addItem: [ :item | 
-			item
-				name: 'Save';
-				description: 'Save';
-				action: [ self acceptTextEdits.
-					self saveFile ] ].
-	group
-		addItem: [ :item | 
-			item
-				name: 'Jump';
-				description: 'Jump To Line';
-				action: [ self jumpToLine ] ]
+				addItem: [ :item | 
+					item
+						name: 'Line#s';
+						description: 'Line#s';
+						icon: Smalltalk ui icons repairIcon;
+						action: [ self turnOnLineNumbers ] ].
+			group
+				addItem: [ :item | 
+					item
+						name: 'Find';
+						description: 'Find';
+						icon: Smalltalk ui icons smallQAIcon;
+						action: [ self openFindDialog ] ].
+			group
+				addItem: [ :item | 
+					item
+						name: 'Open...';
+						description: 'Open';
+						icon: Smalltalk ui icons openIcon;
+						action: [ self openFileFromDialog. ] ].
+			group
+				addItem: [ :item | 
+					item
+						name: 'Save';
+						description: 'Save';
+						action: [ self saveFile ] ].
+			group
+				addItem: [ :item | 
+					item
+						name: 'Jump';
+						description: 'Jump To Line';
+						action: [ self jumpToLine ] ].			
+						
 
-	"TODO: implementation doesn't work currently, hide it. RPW 01-31-2020"
-	"group
-		addItem: [ :item | 
-			item
-				name: 'Transform';
-				description: 'Transform selected text with arbitrary Smalltalk code';
-				action: [ self sendToTextFilter ] ]"
 ]
 
 { #category : #accessing }
@@ -114,22 +96,12 @@ NotesMarkdownFileEditorWindowBase >> defaultFolderPath: anObject [
 	defaultFolderPath := anObject
 ]
 
-{ #category : #'as yet unclassified' }
-NotesMarkdownFileEditorWindowBase >> hasUnsavedContent [
-	"comment stating purpose of message"
-
- ^ text hasUnacceptedEdits .
-]
-
 { #category : #initialization }
 NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 	"comment stating purpose of message"
 
 	text := TextModel new.
-
-	self askOkToClose: false.
 	self focusOrder add: text.
-	lineNumbersVisible := false.
 ]
 
 { #category : #'as yet unclassified' }
@@ -164,7 +136,8 @@ NotesMarkdownFileEditorWindowBase >> openFileFromDialog [
 	str := stream contents.
 	stream close.
 	text text: str.
-	text hasUnacceptedEdits: false.
+
+	
 ]
 
 { #category : #accessing }
@@ -194,21 +167,6 @@ NotesMarkdownFileEditorWindowBase >> scrollDown: clicksWorth [
 	self text textArea scrollPane vScrollbar scrollDown: clicksWorth .  "= clicking mouse  button X times"
 ]
 
-{ #category : #'as yet unclassified' }
-NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
-	"take the current selection and send it as an attribute of a new Playground"
-
-	| textToFilter playground bindings |
-
-	textToFilter := text getSelection.
-
-	bindings := Dictionary newFrom: {(#inText -> textToFilter)}.
-	playground := Smalltalk tools workspace openContents: 'inText'.
-	playground setBindings: bindings
-	
-"TODO: fix me!!"
-]
-
 { #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> text [
 	^ text
@@ -220,44 +178,8 @@ NotesMarkdownFileEditorWindowBase >> text: anObject [
 ]
 
 { #category : #'as yet unclassified' }
-NotesMarkdownFileEditorWindowBase >> turnOffLineNumbers [
-	"comment stating purpose of message"
-
-text textArea withoutLineNumbers .
-lineNumbersVisible := false.
-]
-
-{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> turnOnLineNumbers [
-	text textArea withLineNumbers.
-	lineNumbersVisible := true.
-]
 
-{ #category : #'as yet unclassified' }
-NotesMarkdownFileEditorWindowBase >> windowIsClosing [
-	"called from SpecWindow (SystemWindow) delete.
+(text textArea) withLineNumbers .
 
-There is NO take-backies at this point. We're too far gone and the window WILL be closing with or without us.
- There is no cancel, only save (or not)"
-
-	self hasUnsavedContent
-		ifTrue: [ | res |
-
-			res := UIManager default questionWithoutCancel: 'Save edits?'.
-			"Thankfully we CAN use UIManager to show a modal dialog box, which is a blocking operation"
-
-			res
-				ifTrue: [ self acceptTextEdits.
-					self saveFile ].
-
-			Transcript
-				show: 'last chance rescue text BEGIN vvvvvvvvvvvvvvvv';
-				cr;
-				show: self text text string;
-				cr;
-				show: '^^^^^^^^^^^^^^^ last chance rescue END' ].
-
-	Transcript
-		show: 'NoteMode window closing.';
-		cr
 ]
