@@ -23,6 +23,11 @@ NotesFocusUI class >> defaultSpec [
 		^ bodyLayoutSpec .
 ]
 
+{ #category : #example }
+NotesFocusUI class >> example [
+	^ self new openWithSpec.
+]
+
 { #category : #initialization }
 NotesFocusUI >> initializeWidgets [
 	"comment stating purpose of message"
