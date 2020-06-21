@@ -53,7 +53,10 @@ NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 						name: 'Line#s';
 						description: 'Line#s';
 						icon: Smalltalk ui icons repairIcon;
-						action: [ self turnOnLineNumbers ] ].
+						action: [ 
+							lineNumbersVisible ifTrue: [self turnOffLineNumbers] ifFalse: [ 
+							self turnOnLineNumbers ] ].
+					].
 			group
 				addItem: [ :item | 
 					item
@@ -73,7 +76,7 @@ NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 					item
 						name: 'Save';
 						description: 'Save';
-						action: [ self saveFile ] ].
+						action: [ self acceptTextEdits . self saveFile ] ].
 			group
 				addItem: [ :item | 
 					item
