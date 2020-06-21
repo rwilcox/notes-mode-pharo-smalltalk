@@ -32,7 +32,8 @@ Class {
 		'openFileFileReference',
 		'text',
 		'defaultFileName',
-		'defaultFolderPath'
+		'defaultFolderPath',
+		'lineNumbersVisible'
 	],
 	#category : #NotesMode
 }
@@ -43,6 +44,7 @@ NotesMarkdownFileEditorWindowBase >> acceptTextEdits [
 
 	text accept.
 ]
+
 { #category : #adding }
 NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 	group
@@ -100,13 +102,6 @@ NotesMarkdownFileEditorWindowBase >> defaultFolderPath [
 { #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> defaultFolderPath: anObject [
 	defaultFolderPath := anObject
-]
-
-{ #category : #'as yet unclassified' }
-NotesMarkdownFileEditorWindowBase >> hasUnsavedContent [
-	"comment stating purpose of message"
-
- ^ text hasUnacceptedEdits .
 ]
 
 { #category : #'as yet unclassified' }
@@ -213,6 +208,23 @@ NotesMarkdownFileEditorWindowBase >> text [
 { #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> text: anObject [
 	text := anObject
+]
+
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> turnOffLineNumbers [
+	"comment stating purpose of message"
+
+
+(text textArea) withoutLineNumbers  .
+lineNumbersVisible := false.
+]
+
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> turnOnLineNumbers [
+
+(text textArea) withLineNumbers .
+lineNumbersVisible := true.
+
 ]
 
 { #category : #'as yet unclassified' }
