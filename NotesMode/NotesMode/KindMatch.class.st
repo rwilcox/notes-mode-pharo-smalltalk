@@ -5,7 +5,8 @@ Class {
 		'lineNumber',
 		'lineText',
 		'kind',
-		'completed'
+		'completed',
+		'tags'
 	],
 	#category : #NotesMode
 }
@@ -48,6 +49,26 @@ KindMatch >> lineText [
 { #category : #accessing }
 KindMatch >> lineText: anObject [
 	lineText := anObject
+]
+
+{ #category : #accessing }
+KindMatch >> tags [
+	^ tags
+]
+
+{ #category : #accessing }
+KindMatch >> tags: anObject [
+	tags := anObject
+]
+
+{ #category : #'as yet unclassified' }
+KindMatch >> tagsArrayFromString: inString [
+	"turns a tags comment FOO, BAZ into seperate elements in an array"
+
+	|asArray|
+	
+	asArray := inString splitOn: ','.
+	tags := (asArray collect: [ :current | current withoutPrefix: ' '. ] ).
 ]
 
 { #category : #'as yet unclassified' }
