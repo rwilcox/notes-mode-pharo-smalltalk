@@ -52,7 +52,7 @@ NotesUI class >> example [
 	^ self new openWithSpec.
 ]
 
-{ #category : #'acessing text' }
+{ #category : #'Public API' }
 NotesUI >> appendText: itText [
 	"comment stating purpose of message"
 
@@ -237,7 +237,7 @@ NotesUI >> initializeWidgets [
 	
 ]
 
-{ #category : #'UI adaptors' }
+{ #category : #'Public API' }
 NotesUI >> insertStringAtCursor: string [
 	"comment stating purpose of message"
 
