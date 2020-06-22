@@ -84,6 +84,12 @@ NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 						description: 'Jump To Line';
 						action: [ self jumpToLine ] ].			
 						
+			group
+				addItem: [ :item | 
+					item
+						name: '-> Playground';
+						description: 'To Playground';
+						action: [ self sendToTextFilter  ] ].		
 
 ]
 
@@ -196,7 +202,8 @@ NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
 
 	textToFilter := text getSelection.
 
-	bindings := Dictionary newFrom: {(#inText -> textToFilter)}.
+	bindings := Dictionary newFrom: {(#inText -> textToFilter). (#inNotesWindow -> self). (#allText -> text).}.
+	
 	playground := Smalltalk tools workspace openContents: 'inText'.
 	playground setBindings: bindings
 	
