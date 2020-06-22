@@ -58,7 +58,7 @@ NotesFocusUI >> sentFocusContentsToParent [
 self text accept.
 
 self parentNotesUI ifNotNil: [ 
-	self parentNotesUI appendText: (self text getText string). 
+	self parentNotesUI insertStringAtCursor:  ((self text getText string), String cr). 
 	"cast it to a string, not text, to remove formatting. RPW 07/27/2019"
 	].
 ]
