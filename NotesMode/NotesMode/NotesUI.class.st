@@ -6,7 +6,8 @@ Class {
 		'wikiWordsList',
 		'calendarNavigator',
 		'entryPeekText',
-		'dateWorkEntriesCache'
+		'dateWorkEntriesCache',
+		'currentlyListedKindMatches'
 	],
 	#category : #NotesMode
 }
@@ -72,6 +73,16 @@ NotesUI >> calendarNavigator: anObject [
 	calendarNavigator := anObject
 ]
 
+{ #category : #'Public API' }
+NotesUI >> currentlyListedKindMatches [
+	^ currentlyListedKindMatches
+]
+
+{ #category : #accessing }
+NotesUI >> currentlyListedKindMatches: anObject [
+	currentlyListedKindMatches := anObject
+]
+
 { #category : #'as yet unclassified' }
 NotesUI >> displayMultipleLinesofType: aString [
 	"a hack method until we make this better..."
@@ -86,6 +97,8 @@ NotesUI >> displayMultipleLinesofType: aString [
 	p := NotesModeFileParser new.
 	tmp := p matchesForStreamItems: stream matchingKind: aString excludeCompleted: true.  "TODO: actuallyy write this function..."
 
+	self currentlyListedKindMatches: tmp.
+	
 	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString ].
 
 	wikiWordsList items: listItems.
@@ -104,6 +117,7 @@ NotesUI >> displaySingleLinesOfType: aString [
 	p := NotesModeFileParser new.
 	tmp := p matchesForStreamItems: stream matchingKind: aString excludeCompleted: true.
 
+	self currentlyListedKindMatches: tmp.
 	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString ].
 
 	wikiWordsList items: listItems.
