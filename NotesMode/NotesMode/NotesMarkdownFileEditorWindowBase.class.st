@@ -133,16 +133,22 @@ NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 
 { #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> jumpToLine [
-	|whatNumber startIndex stopIndex correspondingRes|
-	
-	whatNumber := TextEntryDialogWindow new openModal entryText asNumber .
+	| whatNumber |
+	whatNumber := TextEntryDialogWindow new openModal entryText asNumber.
+	self jumpToLineNumber: whatNumber
+]
 
-	correspondingRes := text getText indexCorrespendingToLineNumber: whatNumber.
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> jumpToLineNumber: whatNumber [
+	| startIndex correspondingRes stopIndex |
+	
+	correspondingRes := text getText
+		indexCorrespendingToLineNumber: whatNumber.
+		
 	startIndex := correspondingRes at: 1.
 	stopIndex := correspondingRes at: 2.
-
-	self text textArea selectFrom: startIndex  to: stopIndex.
-	self text textArea scrollPane scrollSelectionIntoView.
+	self text textArea selectFrom: startIndex to: stopIndex.
+	self text textArea scrollPane scrollSelectionIntoView
 ]
 
 { #category : #'as yet unclassified' }

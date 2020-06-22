@@ -211,12 +211,12 @@ NotesUI >> initializeWidgets [
 	
 	wikiWordsList := self newList.	" a ListModel"
 	wikiWordsList items: {'entity list'}.
-	"wikiWordsList whenSelectedItemChanged: [ :txtLine|| numberLocation |
-		numberLocation := txtLine findString: '||||'.
+	wikiWordsList whenSelectedItemChanged: [ :txtLine|| numberLocation |
+		numberLocation := (txtLine substrings: '||||') at: 2.
 		
-		 Transcript show: (txtLine copyFrom: numberLocation + 4).  
+		self jumpToLineNumber: (numberLocation asInteger).  
 		].
-	"
+	
 	"TODO: implement me properly."
 	
 	entryPeekText := TextModel new.
