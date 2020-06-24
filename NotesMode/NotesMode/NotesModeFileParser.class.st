@@ -192,6 +192,8 @@ NotesModeFileParser >> matchesForStreamItems: stream matchingKind: kind excludeC
 						kind: kind;
 						lineText: each;
 						lineNumber: counter.
+					kindMatch tagsArrayFromString: (Utils tagStringFromLine: each).
+					
 					output add: kindMatch ].
 			counter := counter + 1 ].
 	^ output
