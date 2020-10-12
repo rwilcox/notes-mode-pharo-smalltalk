@@ -205,3 +205,20 @@ NotesModeFileParser >> matchesKind: kind excludingCompleted: excludingCompleted 
 
 ^ self matchesForLines: (self inputLines) matchingKind: kind excludeCompleted: excludingCompleted .
 ]
+
+{ #category : #'as yet unclassified' }
+NotesModeFileParser >> whatOutlineLevelFor: line [
+	"return the number of markdown indents this line has
+
+	TODO: make it work for sextext, etc
+	"
+
+	| regexPattern  didMatch output |
+	
+	output := 0.
+	regexPattern := '^(#*)\W?-.*\[\w+\]\:.+'.
+	didMatch := regexPattern matches: line.
+	didMatch
+		ifTrue: [ output := (regexPattern subexpression: 2) size ].
+	^ output
+]
