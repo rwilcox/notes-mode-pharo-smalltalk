@@ -7,7 +7,8 @@ Class {
 		'calendarNavigator',
 		'entryPeekText',
 		'dateWorkEntriesCache',
-		'currentlyListedKindMatches'
+		'currentlyListedKindMatches',
+		'clearAllDeskAccessories'
 	],
 	#category : #NotesMode
 }
@@ -52,6 +53,26 @@ NotesUI class >> example [
 	^ self new openWithSpec.
 ]
 
+{ #category : #specs }
+NotesUI class >> layoutWithoutDeskAccessories [
+  <spec:#withoutDAs>
+
+	| bodyLayoutSpec |
+	bodyLayoutSpec := SpecLayout composed.
+	bodyLayoutSpec
+		newRow: [ :c | 
+			c
+				add: #text.
+				 ].
+			
+^ SpecLayout composed
+		newColumn: [ :c | 
+			c
+				add: #menu height: self toolbarHeight;
+				add: bodyLayoutSpec ];
+		yourself
+]
+
 { #category : #'Public API' }
 NotesUI >> appendText: itText [
 	"comment stating purpose of message"
@@ -83,7 +104,7 @@ NotesUI >> currentlyListedKindMatches: anObject [
 	currentlyListedKindMatches := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'UI adaptors' }
 NotesUI >> displayMultipleLinesofType: aString [
 	"a hack method until we make this better..."
 
@@ -94,8 +115,8 @@ NotesUI >> displayMultipleLinesofType: aString [
 	stream := LineByLineStream new.
 	stream stream: self openFileReadStream.
 
-	p := NotesModeFileParser new.
-	tmp := p matchesForStreamItems: stream matchingKind: aString excludeCompleted: true.  "TODO: actuallyy write this function..."
+  tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
+  "TODO: right function here?"
 
 	self currentlyListedKindMatches: tmp.
 	
@@ -105,23 +126,19 @@ NotesUI >> displayMultipleLinesofType: aString [
 	wikiWordsList refreshListItems .
 ]
 
-{ #category : #'as yet unclassified' }
-NotesUI >> displaySingleLinesOfType: aString [ 
-	| stream p listItems tmp |
-
+{ #category : #'UI adaptors' }
+NotesUI >> displaySingleLinesOfType: aString [
+	| listItems tmp |
 	listItems := OrderedCollection new.
-
-	stream := LineByLineStream new.
-	stream stream: self openFileReadStream.
-
-	p := NotesModeFileParser new.
-	tmp := p matchesForStreamItems: stream matchingKind: aString excludeCompleted: true.
-
+	tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
+	
 	self currentlyListedKindMatches: tmp.
-	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString ].
-
+	tmp
+		do: [ :current | 
+			listItems
+				add: current lineText , ' |||| ' , current lineNumber asString ].
 	wikiWordsList items: listItems.
-	wikiWordsList refreshListItems .
+	wikiWordsList refreshListItems
 ]
 
 { #category : #'UI adaptors' }
@@ -178,63 +195,59 @@ NotesUI >> handleDateClicked: whatDate [
 ]
 
 { #category : #initialization }
+NotesUI >> handleEntityListClickOn: txtLine [
+	| numberLocation txtLineSplits |
+	txtLine ifNotNil: [ 
+		txtLineSplits := txtLine substrings: '||||'.
+		txtLineSplits size > 1
+			ifTrue: [ numberLocation := txtLineSplits at: 2.
+				self jumpToLineNumber: numberLocation asInteger ]
+	].
+]
+
+{ #category : #initialization }
+NotesUI >> handleToggleDeskAccessories [
+	"by default we have lots of desk accessories: a calendar, scratch text, entity view.
+	Sometimes the user doesn't want all that. (Sometimes they do)"
+
+	| newLayout |
+	self text accept.
+	
+	clearAllDeskAccessories
+		ifNil: [ newLayout := self class layoutWithoutDeskAccessories.
+			clearAllDeskAccessories := true ]
+		ifNotNil: [ newLayout := self class defaultSpec. clearAllDeskAccessories := nil. ].
+	self needRebuild: false.
+	self buildWithSpecLayout: newLayout
+]
+
+{ #category : #initialization }
 NotesUI >> initializeWidgets [
 	"comment stating purpose of message"
 
 	| calendarAsMorph |
-
 	menu := MenuModel new
 		addGroup: [ :group | 
 			super addStandardToolbarItemsTo: group.
-			
-			group
-				addItem: [ :item | 
-					item
-						name: 'List Entities';
-						description: 'List Entities';
-						subMenu: self listSubMenu.
-						];
-				addItem: [ :item | 
-					item
-						name: 'Focus';
-						description: 'New window whose contents will get appended to the bigger one';
-						action: [ self spawnFocusWindow ] ] ;
-					
-				addItem: [ :item |
-					item
-					name: 'insert';
-					description: 'Insert';
-					subMenu: self insertSubMenu .
-					].
-				 ].
+			self setOurToolbarItemsTo: group ].
 	menu applyTo: self.
-	
 	wikiWordsList := self newList.	" a ListModel"
 	wikiWordsList items: {'entity list'}.
-	wikiWordsList whenSelectedItemChanged: [ :txtLine|| numberLocation |
-		numberLocation := (txtLine substrings: '||||') at: 2.
-		
-		self jumpToLineNumber: (numberLocation asInteger).  
-		].
-	
+	wikiWordsList whenSelectedItemChanged: [ :txtLine | self handleEntityListClickOn: txtLine ].
+
 	"TODO: implement me properly."
-	
 	entryPeekText := TextModel new.
 	entryPeekText text: 'Scratch or focus text'.
-
 	calendarAsMorph := NotesFocusMonthMorph openOn: Date today.
 	calendarNavigator := calendarAsMorph asSpecAdapter.
 	calendarAsMorph announcer
-		subscribe: ChoseDate
+		when: ChoseDate
 		do: [ :inEvent | 
 			| whatDate |
-
 			whatDate := inEvent date.
 			self handleDateClicked: whatDate
 			"entryPeekText text: whatDate mmddyyyy " ].
-
-	super initializeWidgets .
-	
+	super initializeWidgets
 ]
 
 { #category : #'Public API' }
@@ -278,7 +291,19 @@ NotesUI >> insertSubMenu [
 	  
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'Public API' }
+NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
+	| stream p |
+	stream := LineByLineStream new.
+	stream stream: self openFileReadStream.
+	p := NotesModeFileParser new.
+	^ p
+		matchesForStreamItems: stream
+		matchingKind: aString
+		excludeCompleted: exclude
+]
+
+{ #category : #'UI Builder' }
 NotesUI >> listSubMenu [
 	^ MenuModel new addGroup: [ :group |
 		group addItem: [ :item |
@@ -318,6 +343,31 @@ NotesUI >> menu: anObject [
 NotesUI >> openFileFromDialog [
 	super openFileFromDialog .
 	dateWorkEntriesCache := self getLogEntriesByDate.
+]
+
+{ #category : #initialization }
+NotesUI >> setOurToolbarItemsTo: group [
+group
+				addItem: [ :item | 
+					item
+						name: 'List Entities';
+						description: 'List Entities';
+						subMenu: self listSubMenu ];
+				addItem: [ :item | 
+					item
+						name: 'Focus';
+						description: 'New window whose contents will get appended to the bigger one';
+						action: [ self spawnFocusWindow ] ];
+				addItem: [ :item | 
+					item
+						name: 'insert';
+						description: 'Insert';
+						subMenu: self insertSubMenu ] ;
+				addItem: [ :item |
+						item name: 'Toggle DAs';
+						description: 'Toggle Desk Accessories';
+						action: [ self handleToggleDeskAccessories ]
+						 ].
 ]
 
 { #category : #'as yet unclassified' }

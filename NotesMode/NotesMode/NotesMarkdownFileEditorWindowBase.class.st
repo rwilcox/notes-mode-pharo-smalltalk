@@ -140,15 +140,19 @@ NotesMarkdownFileEditorWindowBase >> jumpToLine [
 
 { #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> jumpToLineNumber: whatNumber [
-	| startIndex correspondingRes stopIndex |
+	| startIndex correspondingRes stopIndex txtModel|
 	
-	correspondingRes := text getText
-		indexCorrespendingToLineNumber: whatNumber.
-		
-	startIndex := correspondingRes at: 1.
-	stopIndex := correspondingRes at: 2.
-	self text textArea selectFrom: startIndex to: stopIndex.
-	self text textArea scrollPane scrollSelectionIntoView
+	txtModel := text getText.
+	( txtModel respondsTo: #indexCorrespendingToLineNumber: ) ifTrue: [ 
+
+    	correspondingRes := txtModel indexCorrespendingToLineNumber: whatNumber.
+		startIndex := correspondingRes at: 1.
+		stopIndex := correspondingRes at: 2.
+		self text textArea selectFrom: startIndex to: stopIndex.
+		self text textArea scrollPane scrollSelectionIntoView
+	] ifFalse: [ 
+        GrowlMorph openWithLabel: 'NotesMode' contents: 'could not goto line number (method not defined right now)' 		
+		].
 ]
 
 { #category : #'as yet unclassified' }
