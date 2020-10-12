@@ -7,7 +7,8 @@ Class {
 		'calendarNavigator',
 		'entryPeekText',
 		'dateWorkEntriesCache',
-		'currentlyListedKindMatches'
+		'currentlyListedKindMatches',
+		'clearAllDeskAccessories'
 	],
 	#category : #NotesMode
 }
@@ -178,6 +179,17 @@ NotesUI >> handleDateClicked: whatDate [
 ]
 
 { #category : #initialization }
+NotesUI >> handleEntityListClickOn: txtLine [
+	| numberLocation txtLineSplits |
+	txtLine ifNotNil: [ 
+		txtLineSplits := txtLine substrings: '||||'.
+		txtLineSplits size > 1
+			ifTrue: [ numberLocation := txtLineSplits at: 2.
+				self jumpToLineNumber: numberLocation asInteger ]
+	].
+]
+
+{ #category : #initialization }
 NotesUI >> initializeWidgets [
 	"comment stating purpose of message"
 
@@ -318,6 +330,31 @@ NotesUI >> menu: anObject [
 NotesUI >> openFileFromDialog [
 	super openFileFromDialog .
 	dateWorkEntriesCache := self getLogEntriesByDate.
+]
+
+{ #category : #initialization }
+NotesUI >> setOurToolbarItemsTo: group [
+group
+				addItem: [ :item | 
+					item
+						name: 'List Entities';
+						description: 'List Entities';
+						subMenu: self listSubMenu ];
+				addItem: [ :item | 
+					item
+						name: 'Focus';
+						description: 'New window whose contents will get appended to the bigger one';
+						action: [ self spawnFocusWindow ] ];
+				addItem: [ :item | 
+					item
+						name: 'insert';
+						description: 'Insert';
+						subMenu: self insertSubMenu ] ;
+				addItem: [ :item |
+						item name: 'Toggle DAs';
+						description: 'Toggle Desk Accessories';
+						action: [ self handleToggleDeskAccessories ]
+						 ].
 ]
 
 { #category : #'as yet unclassified' }
