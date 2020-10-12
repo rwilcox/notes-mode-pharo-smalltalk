@@ -104,7 +104,7 @@ NotesUI >> currentlyListedKindMatches: anObject [
 	currentlyListedKindMatches := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'UI adaptors' }
 NotesUI >> displayMultipleLinesofType: aString [
 	"a hack method until we make this better..."
 
@@ -115,8 +115,8 @@ NotesUI >> displayMultipleLinesofType: aString [
 	stream := LineByLineStream new.
 	stream stream: self openFileReadStream.
 
-	p := NotesModeFileParser new.
-	tmp := p matchesForStreamItems: stream matchingKind: aString excludeCompleted: true.  "TODO: actuallyy write this function..."
+  tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
+  "TODO: right function here?"
 
 	self currentlyListedKindMatches: tmp.
 	
@@ -126,23 +126,19 @@ NotesUI >> displayMultipleLinesofType: aString [
 	wikiWordsList refreshListItems .
 ]
 
-{ #category : #'as yet unclassified' }
-NotesUI >> displaySingleLinesOfType: aString [ 
-	| stream p listItems tmp |
-
+{ #category : #'UI adaptors' }
+NotesUI >> displaySingleLinesOfType: aString [
+	| listItems tmp |
 	listItems := OrderedCollection new.
-
-	stream := LineByLineStream new.
-	stream stream: self openFileReadStream.
-
-	p := NotesModeFileParser new.
-	tmp := p matchesForStreamItems: stream matchingKind: aString excludeCompleted: true.
-
+	tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
+	
 	self currentlyListedKindMatches: tmp.
-	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString ].
-
+	tmp
+		do: [ :current | 
+			listItems
+				add: current lineText , ' |||| ' , current lineNumber asString ].
 	wikiWordsList items: listItems.
-	wikiWordsList refreshListItems .
+	wikiWordsList refreshListItems
 ]
 
 { #category : #'UI adaptors' }
@@ -293,6 +289,18 @@ NotesUI >> insertSubMenu [
 			action: [ self insertStringAtCursor: '- [TODO]: ' ] ].
 		].
 	  
+]
+
+{ #category : #'Public API' }
+NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
+	| stream p |
+	stream := LineByLineStream new.
+	stream stream: self openFileReadStream.
+	p := NotesModeFileParser new.
+	^ p
+		matchesForStreamItems: stream
+		matchingKind: aString
+		excludeCompleted: exclude
 ]
 
 { #category : #'UI Builder' }
