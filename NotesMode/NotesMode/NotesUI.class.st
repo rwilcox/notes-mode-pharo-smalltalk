@@ -194,59 +194,28 @@ NotesUI >> initializeWidgets [
 	"comment stating purpose of message"
 
 	| calendarAsMorph |
-
 	menu := MenuModel new
 		addGroup: [ :group | 
 			super addStandardToolbarItemsTo: group.
-			
-			group
-				addItem: [ :item | 
-					item
-						name: 'List Entities';
-						description: 'List Entities';
-						subMenu: self listSubMenu.
-						];
-				addItem: [ :item | 
-					item
-						name: 'Focus';
-						description: 'New window whose contents will get appended to the bigger one';
-						action: [ self spawnFocusWindow ] ] ;
-					
-				addItem: [ :item |
-					item
-					name: 'insert';
-					description: 'Insert';
-					subMenu: self insertSubMenu .
-					].
-				 ].
+			self setOurToolbarItemsTo: group ].
 	menu applyTo: self.
-	
 	wikiWordsList := self newList.	" a ListModel"
 	wikiWordsList items: {'entity list'}.
-	wikiWordsList whenSelectedItemChanged: [ :txtLine|| numberLocation |
-		numberLocation := (txtLine substrings: '||||') at: 2.
-		
-		self jumpToLineNumber: (numberLocation asInteger).  
-		].
-	
+	wikiWordsList whenSelectedItemChanged: [ :txtLine | self handleEntityListClickOn: txtLine ].
+
 	"TODO: implement me properly."
-	
 	entryPeekText := TextModel new.
 	entryPeekText text: 'Scratch or focus text'.
-
 	calendarAsMorph := NotesFocusMonthMorph openOn: Date today.
 	calendarNavigator := calendarAsMorph asSpecAdapter.
 	calendarAsMorph announcer
-		subscribe: ChoseDate
+		when: ChoseDate
 		do: [ :inEvent | 
 			| whatDate |
-
 			whatDate := inEvent date.
 			self handleDateClicked: whatDate
 			"entryPeekText text: whatDate mmddyyyy " ].
-
-	super initializeWidgets .
-	
+	super initializeWidgets
 ]
 
 { #category : #'Public API' }
@@ -290,7 +259,7 @@ NotesUI >> insertSubMenu [
 	  
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'UI Builder' }
 NotesUI >> listSubMenu [
 	^ MenuModel new addGroup: [ :group |
 		group addItem: [ :item |
