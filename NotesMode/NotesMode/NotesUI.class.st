@@ -53,6 +53,26 @@ NotesUI class >> example [
 	^ self new openWithSpec.
 ]
 
+{ #category : #specs }
+NotesUI class >> layoutWithoutDeskAccessories [
+  <spec:#withoutDAs>
+
+	| bodyLayoutSpec |
+	bodyLayoutSpec := SpecLayout composed.
+	bodyLayoutSpec
+		newRow: [ :c | 
+			c
+				add: #text.
+				 ].
+			
+^ SpecLayout composed
+		newColumn: [ :c | 
+			c
+				add: #menu height: self toolbarHeight;
+				add: bodyLayoutSpec ];
+		yourself
+]
+
 { #category : #'Public API' }
 NotesUI >> appendText: itText [
 	"comment stating purpose of message"
@@ -187,6 +207,22 @@ NotesUI >> handleEntityListClickOn: txtLine [
 			ifTrue: [ numberLocation := txtLineSplits at: 2.
 				self jumpToLineNumber: numberLocation asInteger ]
 	].
+]
+
+{ #category : #initialization }
+NotesUI >> handleToggleDeskAccessories [
+	"by default we have lots of desk accessories: a calendar, scratch text, entity view.
+	Sometimes the user doesn't want all that. (Sometimes they do)"
+
+	| newLayout |
+	self text accept.
+	
+	clearAllDeskAccessories
+		ifNil: [ newLayout := self class layoutWithoutDeskAccessories.
+			clearAllDeskAccessories := true ]
+		ifNotNil: [ newLayout := self class defaultSpec. clearAllDeskAccessories := nil. ].
+	self needRebuild: false.
+	self buildWithSpecLayout: newLayout
 ]
 
 { #category : #initialization }
