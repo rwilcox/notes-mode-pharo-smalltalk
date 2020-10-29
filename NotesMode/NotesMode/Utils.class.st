@@ -18,3 +18,18 @@ Utils class >> easyJoinArray: inStringArray [
 ' ].
 	^ b contents
 ]
+
+{ #category : #'as yet unclassified' }
+Utils class >> tagStringFromLine: line [
+	"comment stating purpose of message"
+
+  |r output|
+
+  r := '.+ =\[(.+)\]' asRegex.
+
+  (r matches: line) ifTrue: [.
+  	output := r subexpression: 2.
+  ].
+
+  ^ output.
+]

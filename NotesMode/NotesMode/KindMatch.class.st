@@ -61,14 +61,13 @@ KindMatch >> tags: anObject [
 	tags := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 KindMatch >> tagsArrayFromString: inString [
-	"turns a tags comment FOO, BAZ into seperate elements in an array"
-
-	|asArray|
+	| asArray |
+	inString isNil ifTrue: [ ^ self ].
 	
 	asArray := inString splitOn: ','.
-	tags := (asArray collect: [ :current | current withoutPrefix: ' '. ] ).
+	tags := asArray collect: [ :current | current withoutPrefix: ' ' ]
 ]
 
 { #category : #'as yet unclassified' }

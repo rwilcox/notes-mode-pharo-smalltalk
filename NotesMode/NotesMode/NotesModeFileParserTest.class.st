@@ -170,3 +170,21 @@ NotesModeFileParserTest >> testMatchesForLinesMatchingKindExcludeCompletedOnlyCo
 	txt := (res at: 1) lineText.
 	self should: [ txt = '- [TODO]: Make supper' ]
 ]
+
+{ #category : #tests }
+NotesModeFileParserTest >> testMultilineEntriesFindsWhenPeerOfTheItemIsFound [
+	"If the Markdown indent level of the explicit item matches a newly found level, end the explicit item's MultilineKindMatch"
+
+	| nm txt regexPattern|
+	
+	
+	nm := NotesModeFileParser new.
+	txt := '### - [NOTE]: this is a note with an extra line in here.
+	
+	Extra line
+	
+	### - [MEETING]: this is an unrelated item
+	
+	A line here
+	'
+]

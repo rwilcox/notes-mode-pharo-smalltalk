@@ -192,6 +192,8 @@ NotesModeFileParser >> matchesForStreamItems: stream matchingKind: kind excludeC
 						kind: kind;
 						lineText: each;
 						lineNumber: counter.
+					kindMatch tagsArrayFromString: (Utils tagStringFromLine: each).
+					
 					output add: kindMatch ].
 			counter := counter + 1 ].
 	^ output
@@ -202,4 +204,21 @@ NotesModeFileParser >> matchesKind: kind excludingCompleted: excludingCompleted 
 	"comment stating purpose of message"
 
 ^ self matchesForLines: (self inputLines) matchingKind: kind excludeCompleted: excludingCompleted .
+]
+
+{ #category : #'as yet unclassified' }
+NotesModeFileParser >> whatOutlineLevelFor: line [
+	"return the number of markdown indents this line has
+
+	TODO: make it work for sextext, etc
+	"
+
+	| regexPattern  didMatch output |
+	
+	output := 0.
+	regexPattern := '^(#*)\W?-.*\[\w+\]\:.+'.
+	didMatch := regexPattern matches: line.
+	didMatch
+		ifTrue: [ output := (regexPattern subexpression: 2) size ].
+	^ output
 ]
