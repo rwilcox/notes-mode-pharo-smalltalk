@@ -210,14 +210,19 @@ NotesUI >> handleToggleDeskAccessories [
 	"by default we have lots of desk accessories: a calendar, scratch text, entity view.
 	Sometimes the user doesn't want all that. (Sometimes they do)"
 
-	| newLayout |
+	| newLayout oldText |
 	self text accept.
+	oldText := text text.
 	
 	clearAllDeskAccessories
 		ifNil: [ newLayout := self class layoutWithoutDeskAccessories.
 			clearAllDeskAccessories := true ]
 		ifNotNil: [ newLayout := self class defaultSpec. clearAllDeskAccessories := nil. ].
 	self needRebuild: false.
+	
+	"if I don't do this then new edits to the text are not even accepted. RPW 10/28/2020"
+	text := TextModel new.
+	text text: oldText.
 	self buildWithSpecLayout: newLayout
 ]
 
