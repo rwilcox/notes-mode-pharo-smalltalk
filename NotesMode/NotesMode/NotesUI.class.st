@@ -150,15 +150,13 @@ NotesUI >> displayTodoItems [
 NotesUI >> displayWikiWords [
 	"read and display wiki words for this item in our list"
 
-	| stream p listItems |
+	| p listItems |
 
+	p := NotesModeProjectParser new.
+	p populateProjectFileReferencesFromArray: self readStreamsForAllInProject .
 	listItems := OrderedCollection new.
 
-	stream := LineByLineStream new.
-	stream stream: (self openFileReadStream).
-
-	p := NotesModeFileParser new.
-	(p matchesForImplicitWikiWordsFromStreamItems: stream)
+	(p matchesForImplicitWikiWords)
 		do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString ].
 
 	wikiWordsList items: listItems.
@@ -179,12 +177,11 @@ NotesUI >> entryPeekText: anObject [
 NotesUI >> getLogEntriesByDate [
 	"comment stating purpose of message"
 
-	| p lblstream |
-
-	p := NotesModeFileParser new.
-	lblstream := LineByLineStream new.
-	lblstream stream: self openFileReadStream .
-	^ p matchesForImplicitDayEntryFromStreamItems: lblstream.
+	| p |
+	p := NotesModeProjectParser new.
+	p
+		populateProjectFileReferencesFromArray: self readStreamsForAllInProject.
+	^ p matchesForImplicitDayEntry
 ]
 
 { #category : #'UI adaptors' }
@@ -298,13 +295,12 @@ NotesUI >> insertSubMenu [
 
 { #category : #'Public API' }
 NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
-	| stream p |
-	stream := LineByLineStream new.
-	stream stream: self openFileReadStream.
-	p := NotesModeFileParser new.
+	| p |
+	
+	p := NotesModeProjectParser new.
+	p populateProjectFileReferencesFromArray: self readStreamsForAllInProject .
 	^ p
-		matchesForStreamItems: stream
-		matchingKind: aString
+		matchesForMatchingKind: aString
 		excludeCompleted: exclude
 ]
 

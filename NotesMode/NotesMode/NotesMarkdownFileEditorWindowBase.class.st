@@ -190,6 +190,11 @@ NotesMarkdownFileEditorWindowBase >> openFindDialog [
 "^^^ yes really, textArea is like the scollableTextMorph, we want the actual textmoph inside that..."
 ]
 
+{ #category : #'Model Related' }
+NotesMarkdownFileEditorWindowBase >> readStreamsForAllInProject [
+	^ {self openFileReadStream}
+]
+
 { #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> saveFile [
 	| stream |
