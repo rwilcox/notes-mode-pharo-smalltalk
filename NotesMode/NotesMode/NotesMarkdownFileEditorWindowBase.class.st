@@ -33,7 +33,8 @@ Class {
 		'text',
 		'defaultFileName',
 		'defaultFolderPath',
-		'lineNumbersVisible'
+		'lineNumbersVisible',
+		'projectFolderReferences'
 	],
 	#category : #NotesMode
 }
@@ -65,12 +66,23 @@ NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 						icon: Smalltalk ui icons smallQAIcon;
 						action: [ self openFindDialog ] ].
 			group
-				addItem: [ :item | 
+				addItem: [ :item || openSubMenu |
+					openSubMenu := MenuModel new addGroup: [ :subMenuGroup |
+						subMenuGroup addItem: [ : newSubItem |
+							newSubItem name: 'Open file...';
+							action: [self openFileFromDialog].
+							 ].
+						subMenuGroup addItem: [ :newSubItem |
+							newSubItem name: 'Open Folder...';
+							action: [self openFolderFromDialog].
+							 ].
+						].
+					
 					item
 						name: 'Open...';
 						description: 'Open';
-						icon: Smalltalk ui icons openIcon;
-						action: [ self openFileFromDialog. ] ].
+						subMenu: openSubMenu.
+			].
 			group
 				addItem: [ :item | 
 					item
@@ -111,6 +123,16 @@ NotesMarkdownFileEditorWindowBase >> defaultFolderPath [
 { #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> defaultFolderPath: anObject [
 	defaultFolderPath := anObject
+]
+
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> fileRefsForAllInProject [
+  |fileRefsForProject|
+  fileRefsForProject := Array new.
+
+	projectFolderReferences ifNotNil: [ fileRefsForProject := projectFolderReferences. ].
+			
+	^ { openFileFileReference } , fileRefsForProject.
 ]
 
 { #category : #'as yet unclassified' }
@@ -190,9 +212,38 @@ NotesMarkdownFileEditorWindowBase >> openFindDialog [
 "^^^ yes really, textArea is like the scollableTextMorph, we want the actual textmoph inside that..."
 ]
 
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> openFolderFromDialog [
+	"comment stating purpose of instance-side message"
+
+	"scope: class-variables  &  instance-variables"
+
+	| uim dir noteFileReferences |
+	uim := UIManager default.
+	dir := uim chooseDirectory.
+	dir entries ifNil: [ ^ 0 ].
+	noteFileReferences := dir entries
+		select: [ :currDirectoryEntry |  "its always a DiskDirectoryEntry"
+			| output|
+			output := (currDirectoryEntry isDirectory) not.
+			output
+				ifTrue: [ output := ( (currDirectoryEntry fullName endsWith: '.md') or: [ currDirectoryEntry fullName endsWith: '.markdown' ]) ].
+			output ]
+		thenCollect: [ :currDirectoryEntry |
+			currDirectoryEntry asFileReference.
+		] .
+	
+	projectFolderReferences := noteFileReferences.
+
+]
+
 { #category : #'Model Related' }
 NotesMarkdownFileEditorWindowBase >> readStreamsForAllInProject [
-	^ {self openFileReadStream}
+
+  ^ self fileRefsForAllInProject collect: [ :currentFileReference |
+     currentFileReference readStream.	
+	].
+
 ]
 
 { #category : #'as yet unclassified' }

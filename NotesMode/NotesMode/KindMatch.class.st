@@ -6,7 +6,8 @@ Class {
 		'lineText',
 		'kind',
 		'completed',
-		'tags'
+		'tags',
+		'foundInFileReference'
 	],
 	#category : #NotesMode
 }
@@ -19,6 +20,16 @@ KindMatch >> completed [
 { #category : #accessing }
 KindMatch >> completed: anObject [
 	completed := anObject
+]
+
+{ #category : #accessing }
+KindMatch >> foundInFileReference [
+	^ foundInFileReference
+]
+
+{ #category : #accessing }
+KindMatch >> foundInFileReference: anObject [
+	foundInFileReference := anObject
 ]
 
 { #category : #accessing }

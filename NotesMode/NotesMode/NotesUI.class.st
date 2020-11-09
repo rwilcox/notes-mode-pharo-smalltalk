@@ -153,7 +153,7 @@ NotesUI >> displayWikiWords [
 	| p listItems |
 
 	p := NotesModeProjectParser new.
-	p populateProjectFileReferencesFromArray: self readStreamsForAllInProject .
+	p populateProjectFileReferencesFromArray: self fileRefsForAllInProject  .
 	listItems := OrderedCollection new.
 
 	(p matchesForImplicitWikiWords)
@@ -180,7 +180,7 @@ NotesUI >> getLogEntriesByDate [
 	| p |
 	p := NotesModeProjectParser new.
 	p
-		populateProjectFileReferencesFromArray: self readStreamsForAllInProject.
+		populateProjectFileReferencesFromArray: self fileRefsForAllInProject .
 	^ p matchesForImplicitDayEntry
 ]
 
@@ -298,7 +298,7 @@ NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
 	| p |
 	
 	p := NotesModeProjectParser new.
-	p populateProjectFileReferencesFromArray: self readStreamsForAllInProject .
+	p populateProjectFileReferencesFromArray: self fileRefsForAllInProject  .
 	^ p
 		matchesForMatchingKind: aString
 		excludeCompleted: exclude

@@ -2,7 +2,8 @@ Class {
 	#name : #NotesModeFileParser,
 	#superclass : #Object,
 	#instVars : [
-		'inputLines'
+		'inputLines',
+		'currentFileReference'
 	],
 	#category : #NotesMode
 }
@@ -28,15 +29,34 @@ NotesModeFileParser >> addLineToDateIfRequired: groups previousLine: lastLine cu
 
 	"we have a date for this line! but we have a new line now, because it isn't what it once was!"
 	(lineDate isNil = false and: (lineDate = current) not)
-		ifTrue: [ groups at: lineDate put: MultilineKindMatch new.
+		ifTrue: [ 
+			| match |
+			match := MultilineKindMatch new.
+			match foundInFileReference: (self currentFileReference ).
+			
+			groups at: lineDate put: match.
 			^ lineDate ].
 
 	"if we have a date for this line. And there was nothing there in the past, set this it the current"
 	(lineDate isNil = false and: (groups includesKey: lineDate) = false)
-		ifTrue: [ groups at: lineDate put: MultilineKindMatch new.
+		ifTrue: [ 
+			|match|
+			match := MultilineKindMatch new.
+			match foundInFileReference: (self currentFileReference ).
+			groups at: lineDate put: match.
 			^ lineDate ].
 
 	^ current
+]
+
+{ #category : #accessing }
+NotesModeFileParser >> currentFileReference [
+	^ currentFileReference
+]
+
+{ #category : #accessing }
+NotesModeFileParser >> currentFileReference: anObject [
+	currentFileReference := anObject
 ]
 
 { #category : #'multi line items' }

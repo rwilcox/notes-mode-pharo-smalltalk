@@ -25,25 +25,27 @@ NotesModeProjectParser >> fileRefsForProject: anObject [
 NotesModeProjectParser >> matchesForImplicitDayEntry [
 	"returns a dictionary where every key is a Smalltalk Date object and every value a MultilineKindMatch of the text entries made during that date object (aka: until the next one)"
 
-	| groups current lastLine stream p|
-
+	| groups |
 	groups := Dictionary new.
-	lastLine := nil.
-	current := nil.
-	
-	"TODO: refactor me for multiple files"
-	p := NotesModeFileParser new.
-	stream := LineByLineStream new.
-	stream stream: (fileRefsForProject first).
-
-	stream
-		do: [ :each | 
-			current := p
-				addLineToDateIfRequired: groups
-				previousLine: lastLine
-				currentLine: each
-				currentDate: current.
-			lastLine := each ].
+	fileRefsForProject
+		do: [ :currentFileRef | 
+			| p stream current lastLine |
+			lastLine := nil.
+			current := nil.
+			
+			p := NotesModeFileParser new.
+			p currentFileReference: currentFileRef.
+			stream := LineByLineStream new.
+			stream stream: currentFileRef readStream .
+			
+			stream
+				do: [ :each | 
+					current := p
+						addLineToDateIfRequired: groups
+						previousLine: lastLine
+						currentLine: each
+						currentDate: current.
+					lastLine := each ] ].
 
 	^ groups
 ]
@@ -52,56 +54,64 @@ NotesModeProjectParser >> matchesForImplicitDayEntry [
 NotesModeProjectParser >> matchesForImplicitWikiWords [
 	"comment stating purpose of message"
 
-	| output counter p stream|
+	| output |
 	output := OrderedCollection new.
-
-  "TODO: refactor me for multiple files"	
-	p := NotesModeFileParser new.
-	stream := LineByLineStream new.
-	stream stream: (fileRefsForProject first).
-	
-	counter := 1.
-	stream
-		do: [ :each | 
-			(p isWikiWordLine: each)
-				ifTrue: [ | kindMatch |
-					kindMatch := KindMatch new.
-					kindMatch
-						completed: false;
-						kind: 'wikiword';
-						lineText: each;
-						lineNumber: counter.
-						output add: kindMatch . ].
-			counter := counter + 1 ].
+	fileRefsForProject
+		do: [ :currentFileRef | 
+			| counter p stream |
+			
+			p := NotesModeFileParser new.
+			p currentFileReference: currentFileRef.
+			stream := LineByLineStream new.
+			stream stream: currentFileRef readStream.
+			counter := 1.
+			
+			stream
+				do: [ :each | 
+					(p isWikiWordLine: each)
+						ifTrue: [ | kindMatch |
+							kindMatch := KindMatch new.
+							kindMatch
+								completed: false;
+								kind: 'wikiword';
+								lineText: each;
+								foundInFileReference: currentFileRef;
+								lineNumber: counter.
+							output add: kindMatch ].
+					counter := counter + 1 ] ].
 	^ output
 ]
 
 { #category : #'single line sections' }
 NotesModeProjectParser >> matchesForMatchingKind: kind excludeCompleted: excludeCompleted [
 	| p theStream output counter |
-
 	output := OrderedCollection new.
-	counter := 1.
-	
-	"TODO: refactor for multiple files"
-	p := NotesModeFileParser new.
-	theStream := LineByLineStream new.
-	theStream stream: (fileRefsForProject first).
-	
-	theStream
-		do: [ :each | 
-			(p isLine: each ofKind: kind excludeCompleted: excludeCompleted )
-				ifTrue: [ | kindMatch |
-					kindMatch := KindMatch new.
-					kindMatch
-						completed: (p isCompletedItemLine: each forKind: kind) = 1;
-						kind: kind;
-						lineText: each;
-						lineNumber: counter.
-					kindMatch tagsArrayFromString: (Utils tagStringFromLine: each).
-					
-					output add: kindMatch ].
-			counter := counter + 1 ].
+	fileRefsForProject
+		do: [ :currentFileRef | 
+			counter := 1.
+			p := NotesModeFileParser new.
+			p currentFileReference: currentFileRef.
+			theStream := LineByLineStream new.
+			theStream stream: currentFileRef readStream.
+			
+			theStream
+				do: [ :each | 
+					(p isLine: each ofKind: kind excludeCompleted: excludeCompleted)
+						ifTrue: [ 
+							| kindMatch |
+							
+							kindMatch := KindMatch new.
+							kindMatch
+								completed: (p isCompletedItemLine: each forKind: kind) = 1;
+								kind: kind;
+								lineText: each;
+								foundInFileReference: currentFileRef;
+								lineNumber: counter.
+								
+							kindMatch tagsArrayFromString: (Utils tagStringFromLine: each).
+							output add: kindMatch ].
+					counter := counter + 1 ] 
+			].
 	^ output
 ]
 
