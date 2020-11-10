@@ -108,7 +108,7 @@ NotesUI >> currentlyListedKindMatches: anObject [
 NotesUI >> displayMultipleLinesofType: aString [
 	"a hack method until we make this better..."
 
-	| stream p listItems tmp |
+	| stream listItems tmp |
 
 	listItems := OrderedCollection new.
 
@@ -120,7 +120,7 @@ NotesUI >> displayMultipleLinesofType: aString [
 
 	self currentlyListedKindMatches: tmp.
 	
-	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString ].
+	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString, ' |||| ', current foundInFileReference basename ].
 
 	wikiWordsList items: listItems.
 	wikiWordsList refreshListItems .
@@ -136,7 +136,7 @@ NotesUI >> displaySingleLinesOfType: aString [
 	tmp
 		do: [ :current | 
 			listItems
-				add: current lineText , ' |||| ' , current lineNumber asString ].
+				add: current lineText , ' |||| ' , current lineNumber asString, ' |||| ', current foundInFileReference basename].
 	wikiWordsList items: listItems.
 	wikiWordsList refreshListItems
 ]
@@ -157,7 +157,9 @@ NotesUI >> displayWikiWords [
 	listItems := OrderedCollection new.
 
 	(p matchesForImplicitWikiWords)
-		do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString ].
+		do: [ :current | 
+			listItems add: current lineText , ' |||| ' , current lineNumber asString,  ' |||| ', current foundInFileReference basename
+		].
 
 	wikiWordsList items: listItems.
 	wikiWordsList refreshListItems.
@@ -193,12 +195,33 @@ NotesUI >> handleDateClicked: whatDate [
 
 { #category : #initialization }
 NotesUI >> handleEntityListClickOn: txtLine [
-	| numberLocation txtLineSplits |
+	| numberLocation txtLineSplits fileName otherFileNotesMode fileRefIndex fileRefToZoomInto a|
 	txtLine ifNotNil: [ 
 		txtLineSplits := txtLine substrings: '||||'.
 		txtLineSplits size > 1
-			ifTrue: [ numberLocation := txtLineSplits at: 2.
-				self jumpToLineNumber: numberLocation asInteger ]
+			ifTrue: [ 
+				
+				numberLocation := (txtLineSplits at: 2) trim.
+				fileName := (txtLineSplits at: 3) trim.
+				
+				(fileName = (openFileFileReference basename)) ifTrue: [  
+					self jumpToLineNumber: numberLocation asInteger ]
+				ifFalse: [ 
+					
+					fileRefIndex := projectFolderReferences findFirst: [ :current |
+						(current basename) = fileName.
+					].
+				  fileRefToZoomInto := projectFolderReferences at: fileRefIndex.
+				
+					otherFileNotesMode := NotesUIFileEditor new.
+					a := otherFileNotesMode openWithSpec.
+					a title: fileName.
+					
+					otherFileNotesMode openAndDisplayFromFileReference: fileRefToZoomInto.
+					otherFileNotesMode jumpToLineNumber: numberLocation asInteger.
+					
+					 ]
+			].
 	].
 ]
 

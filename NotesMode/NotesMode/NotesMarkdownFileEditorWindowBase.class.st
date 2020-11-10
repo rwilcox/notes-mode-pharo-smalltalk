@@ -178,25 +178,31 @@ NotesMarkdownFileEditorWindowBase >> jumpToLineNumber: whatNumber [
 ]
 
 { #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> openAndDisplayFromFileReference: ref [
+	| stream str |
+	openFileFileReference := ref.
+	stream := openFileFileReference readStream.
+	str := stream contents.
+	stream close.
+	text text: str.
+	text hasUnacceptedEdits: false
+]
+
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> openFileFromDialog [
-	| str uim stream |
-
+	| uim |
 	uim := UIManager default.
-
-	(uim respondsTo: #chooseExistingFileReference:extensions:path:preview)
+	(uim
+		respondsTo: #'chooseExistingFileReference:extensions:path:preview')
 		ifTrue: [ openFileFileReference := uim
 				chooseExistingFileReference: defaultFileName
 				extensions: nil
 				path: defaultFolderPath
 				preview: nil ]
-		ifFalse: [ openFileFileReference := (uim chooseFullFileNameMatching: #('*.md' '*.markdown') label: nil) asFileReference ].
-
-	stream := openFileFileReference readStream.
-	str := stream contents.
-	stream close.
-	text text: str.
-	text hasUnacceptedEdits: false.
-	
+		ifFalse: [ openFileFileReference := (uim
+				chooseFullFileNameMatching: #('*.md' '*.markdown')
+				label: nil) asFileReference ].
+	self openAndDisplayFromFileReference: openFileFileReference.
 ]
 
 { #category : #accessing }
