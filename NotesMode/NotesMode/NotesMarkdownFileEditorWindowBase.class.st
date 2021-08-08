@@ -256,9 +256,26 @@ NotesMarkdownFileEditorWindowBase >> readStreamsForAllInProject [
 NotesMarkdownFileEditorWindowBase >> saveFile [
 	| stream |
 
-	stream := openFileFileReference writeStream.
+   openFileFileReference ifNil: [ |fref|
+	    fref := self saveFileFromDialog .
+	    openFileFileReference := fref asFileReference.
+	].
+ 
+   stream := openFileFileReference writeStream.
 	stream << text text string.
 	stream close.
+]
+
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> saveFileFromDialog [
+	"the create new file version of openFileFromDialog"	
+			
+	| uim |
+	
+	uim := UIManager default.
+	
+	^ uim chooseForSaveFileReference: 'Save file' extensions: #('md') path: (FileLocator home fullPath).
+	
 ]
 
 { #category : #scrolling }
