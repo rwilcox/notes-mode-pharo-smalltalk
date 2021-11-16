@@ -261,7 +261,7 @@ NotesMarkdownFileEditorWindowBase >> saveFile [
 	    openFileFileReference := fref asFileReference.
 	].
  
-   stream := openFileFileReference writeStream.
+   stream := ZnNewLineWriterStream on: (openFileFileReference writeStream).
 	stream << text text string.
 	stream close.
 ]
