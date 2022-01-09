@@ -47,6 +47,19 @@ NotesModeFileParserTest >> testAddLineToDateIfRequiredPreviousLineCurrentLineCur
 	self should: [ (groups at: '05-03-2019' asDate) isNil not ]	"exception thrown if not found"
 ]
 
+{ #category : #tests }
+NotesModeFileParserTest >> testEntitiesForStreamItems [
+	"comment stating purpose of instance-side message"
+	"scope: class-variables  &  instance-variables"	
+			
+		| nm scanLines res |
+	nm := NotesModeFileParser new.
+	scanLines := {'Hello world' . ' - [TODO]: Make supper' . 'today this was the thing I did' . '- (V) [TODO]: another thing I did!'}.
+	res := nm entitiesForStreamItems: scanLines.
+	self should: [ res size = 2 ].
+	self should: [ (res at: 1) kind = 'TODO' ]
+]
+
 { #category : #'tests-accessing' }
 NotesModeFileParserTest >> testIsCompletedItemLineFindsCompletedItems [
 	| nm res |

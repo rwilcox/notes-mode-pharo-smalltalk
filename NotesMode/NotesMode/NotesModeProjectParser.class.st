@@ -84,34 +84,24 @@ NotesModeProjectParser >> matchesForImplicitWikiWords [
 
 { #category : #'single line sections' }
 NotesModeProjectParser >> matchesForMatchingKind: kind excludeCompleted: excludeCompleted [
-	| p theStream output counter |
+	| p theStream output |
 	output := OrderedCollection new.
 	fileRefsForProject
-		do: [ :currentFileRef | 
-			counter := 1.
+		do: [ :currentFileRef | |entities|
 			p := NotesModeFileParser new.
 			p currentFileReference: currentFileRef.
-			theStream := LineByLineStream new.
-			theStream stream: currentFileRef readStream.
+			theStream := p currentFileReferenceAsStream.
 			
-			theStream
-				do: [ :each | 
-					(p isLine: each ofKind: kind excludeCompleted: excludeCompleted)
-						ifTrue: [ 
-							| kindMatch |
-							
-							kindMatch := KindMatch new.
-							kindMatch
-								completed: (p isCompletedItemLine: each forKind: kind) = 1;
-								kind: kind;
-								lineText: each;
-								foundInFileReference: currentFileRef;
-								lineNumber: counter.
-								
-							kindMatch tagsArrayFromString: (Utils tagStringFromLine: each).
-							output add: kindMatch ].
-					counter := counter + 1 ] 
-			].
+			entities := p entitiesForStreamItems: theStream.
+			
+			output addAll: (entities select: [ :currEnt ||include|
+			  (currEnt kind = kind) ifTrue: [ 
+				 include := true.
+				 excludeCompleted ifTrue: [ currEnt completed ifTrue: [ include := false ].].
+				 include.
+				 ].
+		  ]).
+  ].
 	^ output
 ]
 

@@ -59,6 +59,19 @@ NotesModeFileParser >> currentFileReference: anObject [
 	currentFileReference := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+NotesModeFileParser >> currentFileReferenceAsStream [
+	"comment stating purpose of instance-side message"
+	"scope: class-variables  &  instance-variables"	
+			
+	| output |
+	
+  output := LineByLineStream new.
+  output stream: self currentFileReference readStream.
+
+  ^ output.
+]
+
 { #category : #'multi line items' }
 NotesModeFileParser >> dateForDayEntryLine: line previousLine: prevLine [
 	"Do someday support hash tag header lines, for now whatever.
@@ -99,6 +112,56 @@ NotesModeFileParser >> days [
 	"comment stating purpose of message"
 
 	
+]
+
+{ #category : #'as yet unclassified' }
+NotesModeFileParser >> entitiesForStreamItems: stream [
+	"comment stating purpose of instance-side message"
+	"scope: class-variables  &  instance-variables"	
+			
+	| output counter |
+	output := OrderedCollection new.
+	counter := 1.
+	
+   stream do: [ :each || res|
+     	res := self getKindMatchForLine: each lineNumberInFile: counter.
+	     res ifNotNil: [ output add: res. ]. 
+	     counter := counter + 1.
+	 ].
+
+  ^ output.
+]
+
+{ #category : #testing }
+NotesModeFileParser >> getKindMatchForLine: line lineNumberInFile: lineNumber [
+	"If a line has any kind of explicit entity declaration, return a KindMatch for it as appropritae. (else null)"
+	
+	|res output whatEntityKind |
+  res := self isCompletedItemLine: line forKind: '.+'.
+  
+  (res > -1) ifTrue: [ | whatKindRegex regexRes|
+	  whatKindRegex := '^.*\[(.+)\]\:.+'.
+	  regexRes := RxMatcher forString: whatKindRegex.
+	  (regexRes matches: line) ifTrue: [ 
+		  whatEntityKind := (regexRes subexpression: 2)
+		].
+	].
+
+  (res = -1) ifTrue: [ 
+	 "it was not an explicit entity. Check for implicit entries like Wiki words"
+	(self isWikiWordLine: line) ifTrue: [ whatEntityKind := 'wikiword' ].
+  ].
+
+  whatEntityKind ifNotNil: [  
+	  output := KindMatch new.
+	  output completed: (res = 1);
+	  kind: whatEntityKind;
+	  lineNumber: lineNumber;
+	  lineText: line;
+	  foundInFileReference: currentFileReference;
+	  tagsArrayFromString: (Utils tagStringFromLine: line).
+  ].
+  ^ output.
 ]
 
 { #category : #accessors }
@@ -199,24 +262,20 @@ NotesModeFileParser >> matchesForLines: inCollection matchingKind: kind excludeC
 
 { #category : #'single line sections' }
 NotesModeFileParser >> matchesForStreamItems: stream matchingKind: kind excludeCompleted: excludeCompleted [
-	| output counter |
-	output := OrderedCollection new.
-	counter := 1.
-	stream
-		do: [ :each | 
-			(self isLine: each ofKind: kind excludeCompleted: excludeCompleted )
-				ifTrue: [ | kindMatch |
-					kindMatch := KindMatch new.
-					kindMatch
-						completed: (self isCompletedItemLine: each forKind: kind) = 1;
-						kind: kind;
-						lineText: each;
-						lineNumber: counter.
-					kindMatch tagsArrayFromString: (Utils tagStringFromLine: each).
-					
-					output add: kindMatch ].
-			counter := counter + 1 ].
-	^ output
+	| entities|
+	
+	entities := self entitiesForStreamItems: stream.
+	^ entities select: [ :currEntity || includeValue|
+		  includeValue := false.
+		
+		  (currEntity kind = kind) ifTrue: [ 
+			  includeValue := true.
+			  excludeCompleted ifTrue: [ 
+				  (currEntity completed) ifTrue: [ includeValue := false ].   
+			  ].
+			].
+		   includeValue.
+		 ].
 ]
 
 { #category : #'single line sections' }

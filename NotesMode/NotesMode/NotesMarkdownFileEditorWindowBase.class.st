@@ -126,6 +126,16 @@ NotesMarkdownFileEditorWindowBase >> defaultFolderPath: anObject [
 ]
 
 { #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase >> fileParser [
+	|output|
+	
+   output := NotesModeFileParser new.
+   output currentFileReference: openFileFileReference.
+
+  ^ output.
+]
+
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> fileRefsForAllInProject [
   |fileRefsForProject|
   fileRefsForProject := Array new.
@@ -291,7 +301,11 @@ NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
 
 	textToFilter := text getSelection.
 
-	bindings := Dictionary newFrom: {(#inText -> textToFilter). (#inNotesWindow -> self). (#allText -> text).}.
+	bindings := Dictionary newFrom: {
+	  (#inText -> textToFilter). 
+	  (#inNotesWindow -> self). 
+	  (#allText -> text).
+	  (#entities) -> [|fp| fp:= self fileParser. fp entitiesForStreamItems: (fp currentFileReferenceAsStream). ] }.
 	
 	playground := Smalltalk tools workspace openContents: 'inText'.
 	playground setBindings: bindings
