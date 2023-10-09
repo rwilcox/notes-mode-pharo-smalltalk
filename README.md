@@ -116,3 +116,6 @@ An example day list item is below:
     -----------------------------
 
       - Guild World of Warcraft raid at 9:00 PM EST
+
+
+# Notes Mode in Pharo
