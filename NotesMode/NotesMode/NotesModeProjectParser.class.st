@@ -95,11 +95,12 @@ NotesModeProjectParser >> matchesForMatchingKind: kind excludeCompleted: exclude
 			entities := p entitiesForStreamItems: theStream.
 			
 			output addAll: (entities select: [ :currEnt ||include|
+			  include := false.
 			  (currEnt kind = kind) ifTrue: [ 
 				 include := true.
 				 excludeCompleted ifTrue: [ currEnt completed ifTrue: [ include := false ].].
-				 include.
 				 ].
+			   include.
 		  ]).
   ].
 	^ output

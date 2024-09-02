@@ -27,7 +27,7 @@ Internal Representation and Key Implementation Points.
 "
 Class {
 	#name : #NotesMarkdownFileEditorWindowBase,
-	#superclass : #ComposableModel,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'openFileFileReference',
 		'text',
@@ -43,7 +43,8 @@ Class {
 NotesMarkdownFileEditorWindowBase >> acceptTextEdits [
 	"comment stating purpose of message"
 
-	text accept.
+   text editor accept.
+	"text accept." "TODO: do I need to do this?"
 ]
 
 { #category : #adding }
@@ -66,8 +67,9 @@ NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 						icon: Smalltalk ui icons smallQAIcon;
 						action: [ self openFindDialog ] ].
 			group
-				addItem: [ :item || openSubMenu |
-					openSubMenu := MenuModel new addGroup: [ :subMenuGroup |
+				addItem: [ :item || openSubMenu openMenu|
+					openMenu := self newMenu .
+					openSubMenu := openMenu  addGroup: [ :subMenuGroup |
 						subMenuGroup addItem: [ : newSubItem |
 							newSubItem name: 'Open file...';
 							action: [self openFileFromDialog].
@@ -156,10 +158,10 @@ NotesMarkdownFileEditorWindowBase >> hasUnsavedContent [
 NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 	"comment stating purpose of message"
 
-	text := TextModel new.
+	text := self newText .
 
-	self askOkToClose: false.
-	self focusOrder add: text.
+	"self askOkToClose: false."
+	"self focusOrder add: text."
 	lineNumbersVisible := false.
 ]
 
@@ -172,19 +174,18 @@ NotesMarkdownFileEditorWindowBase >> jumpToLine [
 
 { #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> jumpToLineNumber: whatNumber [
-	| startIndex correspondingRes stopIndex txtModel|
+	| startIndex correspondingRes stopIndex txtModel scrollPane txtStr|
 	
-	txtModel := text getText.
-	( txtModel respondsTo: #indexCorrespendingToLineNumber: ) ifTrue: [ 
-
-    	correspondingRes := txtModel indexCorrespendingToLineNumber: whatNumber.
-		startIndex := correspondingRes at: 1.
-		stopIndex := correspondingRes at: 2.
-		self text textArea selectFrom: startIndex to: stopIndex.
-		self text textArea scrollPane scrollSelectionIntoView
-	] ifFalse: [ 
-        GrowlMorph openWithLabel: 'NotesMode' contents: 'could not goto line number (method not defined right now)' 		
-		].
+	txtModel := text adapter model.
+	scrollPane := txtModel adapter widget scrollPane .
+	
+	txtStr  := txtModel text.
+   correspondingRes := txtStr  indexCorrespendingToLineNumber: whatNumber.
+	startIndex := correspondingRes at: 1.
+	stopIndex := correspondingRes at: 2.
+	self text selectionInterval: (startIndex to: stopIndex ). "textArea selectFrom: startIndex to: stopIndex."
+	scrollPane scrollSelectionIntoView.
+	"GrowlMorph openWithLabel: 'NotesMode' contents: 'could not goto line number (method not defined right now)'"
 ]
 
 { #category : #'as yet unclassified' }
@@ -224,7 +225,8 @@ NotesMarkdownFileEditorWindowBase >> openFileReadStream [
 
 { #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> openFindDialog [
-	(text textArea) textArea announce: RubFindReplaceWindowRequired .
+   text doTextFind .
+	"(text textArea) textArea announce: RubFindReplaceWindowRequired ."
 "^^^ yes really, textArea is like the scollableTextMorph, we want the actual textmoph inside that..."
 ]
 
@@ -297,9 +299,9 @@ NotesMarkdownFileEditorWindowBase >> scrollDown: clicksWorth [
 NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
 	"take the current selection and send it as an attribute of a new Playground"
 
-	| textToFilter playground bindings |
+	| textToFilter playground bindings t|
 
-	textToFilter := text getSelection.
+	textToFilter := text adapter editor selection.
 
 	bindings := Dictionary newFrom: {
 	  (#inText -> textToFilter). 
@@ -307,8 +309,17 @@ NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
 	  (#allText -> text).
 	  (#entities) -> [|fp| fp:= self fileParser. fp entitiesForStreamItems: (fp currentFileReferenceAsStream). ] }.
 	
-	playground := Smalltalk tools workspace openContents: 'inText'.
-	playground setBindings: bindings
+	"playground := Smalltalk tools workspace.
+	playground openContents: 'inText'."
+	playground := StPlayground new.
+	playground contents: 'inText' .
+	
+	
+	"will be a StPlayground"
+	t := playground page.
+	playground setBindings: bindings.
+	
+	playground openWithSpec .
 	
 "TODO: fix me!!"
 ]
@@ -327,15 +338,16 @@ NotesMarkdownFileEditorWindowBase >> text: anObject [
 NotesMarkdownFileEditorWindowBase >> turnOffLineNumbers [
 	"comment stating purpose of message"
 
+self text adapter widget withoutLineNumbers .
 
-(text textArea) withoutLineNumbers  .
 lineNumbersVisible := false.
 ]
 
 { #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> turnOnLineNumbers [
 
-(text textArea) withLineNumbers .
+self text adapter widget withLineNumbers .
+
 lineNumbersVisible := true.
 
 ]

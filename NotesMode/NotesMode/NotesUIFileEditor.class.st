@@ -47,7 +47,9 @@ NotesUIFileEditor class >> example [
 
 { #category : #initialization }
 NotesUIFileEditor >> initializeWidgets [
-	menu := MenuModel new
+   |cMenu|
+   cMenu := self newMenuBar.
+	cMenu
 		addGroup: [ :group | 
 			super addStandardToolbarItemsTo: group.
 			

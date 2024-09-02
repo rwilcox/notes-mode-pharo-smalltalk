@@ -16,13 +16,18 @@ Class {
 { #category : #specs }
 NotesUI class >> defaultSpec [
 	<spec: #default>
-	| bodyLayoutSpec rightSidebarLayoutSpec calendarPickerLayoutSpec |
+	| bodyLayoutSpec rightSidebarLayoutSpec calendarPickerLayoutSpec res rLayout|
 
-	bodyLayoutSpec := SpecLayout composed.
-	rightSidebarLayoutSpec := SpecLayout composed.
-	calendarPickerLayoutSpec := SpecLayout composed.
+	bodyLayoutSpec := SpBoxLayout newHorizontal .
+	rightSidebarLayoutSpec := SpBoxLayout newVertical .
+	calendarPickerLayoutSpec := SpBoxLayout  newVertical .
 
-calendarPickerLayoutSpec newRow: [ :c |
+calendarPickerLayoutSpec add: #calendarNavigator.
+calendarPickerLayoutSpec add: #entryPeekText.
+
+rightSidebarLayoutSpec add: #wikiWordsList.
+"rightSidebarLayoutSpec add: calendarPickerLayoutSpec ."
+"calendarPickerLayoutSpec newRow: [ :c |
 	c add: #calendarNavigator;
 	add: #entryPeekText
 	 ].
@@ -38,14 +43,19 @@ calendarPickerLayoutSpec newRow: [ :c |
 			c
 				add: #text;
 				addVSplitter;
-				"VSplitter lets the columns be resizable"
-					add: rightSidebarLayoutSpec ].
-	^ SpecLayout composed
-		newColumn: [ :c | 
-			c
-				add: #menu height: self toolbarHeight;
-				add: bodyLayoutSpec ];
-		yourself
+				'VSplitter lets the columns be resizable'
+					add: rightSidebarLayoutSpec ]."
+
+	res := SpBoxLayout newHorizontal.
+	res add: #text.
+	"res newSplitter ."
+	
+	res add: rightSidebarLayoutSpec  .
+	"res add: #menu."
+	rLayout := SpBoxLayout newVertical.
+	rLayout add: #menu expand: false.
+	rLayout add: res.
+	^ rLayout.
 ]
 
 { #category : #example }
@@ -58,19 +68,11 @@ NotesUI class >> layoutWithoutDeskAccessories [
   <spec:#withoutDAs>
 
 	| bodyLayoutSpec |
-	bodyLayoutSpec := SpecLayout composed.
-	bodyLayoutSpec
-		newRow: [ :c | 
-			c
-				add: #text.
-				 ].
-			
-^ SpecLayout composed
-		newColumn: [ :c | 
-			c
-				add: #menu height: self toolbarHeight;
-				add: bodyLayoutSpec ];
-		yourself
+	bodyLayoutSpec := SpBoxLayout newVertical .
+	bodyLayoutSpec add: #menu expand: false.
+	bodyLayoutSpec add: #text.
+		
+	^ bodyLayoutSpec .		
 ]
 
 { #category : #'Public API' }
@@ -123,7 +125,7 @@ NotesUI >> displayMultipleLinesofType: aString [
 	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString, ' |||| ', current foundInFileReference basename ].
 
 	wikiWordsList items: listItems.
-	wikiWordsList refreshListItems .
+	"wikiWordsList refreshListItems ."
 ]
 
 { #category : #'UI adaptors' }
@@ -138,7 +140,7 @@ NotesUI >> displaySingleLinesOfType: aString [
 			listItems
 				add: current lineText , ' |||| ' , current lineNumber asString, ' |||| ', current foundInFileReference basename].
 	wikiWordsList items: listItems.
-	wikiWordsList refreshListItems
+	"wikiWordsList refreshListItems"
 ]
 
 { #category : #'UI adaptors' }
@@ -162,7 +164,7 @@ NotesUI >> displayWikiWords [
 		].
 
 	wikiWordsList items: listItems.
-	wikiWordsList refreshListItems.
+	"wikiWordsList refreshListItems."
 ]
 
 { #category : #accessing }
@@ -194,8 +196,9 @@ NotesUI >> handleDateClicked: whatDate [
 ]
 
 { #category : #initialization }
-NotesUI >> handleEntityListClickOn: txtLine [
-	| numberLocation txtLineSplits fileName otherFileNotesMode fileRefIndex fileRefToZoomInto a|
+NotesUI >> handleEntityListClickOn: selectedInfo [
+	| numberLocation txtLineSplits fileName otherFileNotesMode fileRefIndex fileRefToZoomInto a txtLine|
+	txtLine := selectedInfo selectedItem.
 	txtLine ifNotNil: [ 
 		txtLineSplits := txtLine substrings: '||||'.
 		txtLineSplits size > 1
@@ -230,20 +233,18 @@ NotesUI >> handleToggleDeskAccessories [
 	"by default we have lots of desk accessories: a calendar, scratch text, entity view.
 	Sometimes the user doesn't want all that. (Sometimes they do)"
 
-	| newLayout oldText |
-	self text accept.
-	oldText := text text.
+	| newLayout |
 	
 	clearAllDeskAccessories
 		ifNil: [ newLayout := self class layoutWithoutDeskAccessories.
 			clearAllDeskAccessories := true ]
 		ifNotNil: [ newLayout := self class defaultSpec. clearAllDeskAccessories := nil. ].
-	self needRebuild: false.
+	self needRebuild: true.
 	
 	"if I don't do this then new edits to the text are not even accepted. RPW 10/28/2020"
-	text := TextModel new.
-	text text: oldText.
-	self buildWithSpecLayout: newLayout
+	"text := TextModel new.
+	text text: oldText."
+	self replaceLayoutWith:  newLayout
 ]
 
 { #category : #initialization }
@@ -251,27 +252,27 @@ NotesUI >> initializeWidgets [
 	"comment stating purpose of message"
 
 	| calendarAsMorph |
-	menu := MenuModel new
+   menu := self newMenuBar 
 		addGroup: [ :group | 
 			super addStandardToolbarItemsTo: group.
 			self setOurToolbarItemsTo: group ].
-	menu applyTo: self.
-	wikiWordsList := self newList.	" a ListModel"
+	"menu applyTo: self."
+	wikiWordsList := self newList.	 "a ListModel"
 	wikiWordsList items: {'entity list'}.
-	wikiWordsList whenSelectedItemChanged: [ :txtLine | self handleEntityListClickOn: txtLine ].
+	wikiWordsList whenActivatedDo:  [ :txtLine | self handleEntityListClickOn: txtLine ].
 
 	"TODO: implement me properly."
-	entryPeekText := TextModel new.
+	entryPeekText := self newText.
 	entryPeekText text: 'Scratch or focus text'.
-	calendarAsMorph := NotesFocusMonthMorph openOn: Date today.
-	calendarNavigator := calendarAsMorph asSpecAdapter.
+	"calendarAsMorph := NotesFocusMonthMorph openOn: Date today.
+	calendarNavigator := calendarAsMorph presenter.
 	calendarAsMorph announcer
 		when: ChoseDate
 		do: [ :inEvent | 
 			| whatDate |
 			whatDate := inEvent date.
-			self handleDateClicked: whatDate
-			"entryPeekText text: whatDate mmddyyyy " ].
+			self handleDateClicked: whatDate"
+			"entryPeekText text: whatDate mmddyyyy " "]."
 	super initializeWidgets
 ]
 
@@ -281,7 +282,7 @@ NotesUI >> insertStringAtCursor: string [
 
 	| selectedLocation newInput input currentCharacterLocation|
 
-	self text accept.
+	"self text accept."
 
 	selectedLocation := self text getSelection.
 	currentCharacterLocation := selectedLocation first.
@@ -300,8 +301,9 @@ NotesUI >> insertStringAtCursor: string [
 { #category : #'UI Builder' }
 NotesUI >> insertSubMenu [
 "thanks very much to the ApplicationWithToolbar Spec-Example, in the image"
-
-	^ MenuModel new addGroup: [ :group |
+   |aMenu|
+   aMenu := self newMenu.
+   aMenu addGroup: [ :group |
 		group addItem: [ :item |
 			item name: 'Work Log';
 			action: [ self insertStringAtCursor: (SnippetsCollection new worklogSnippet ) ] ].
@@ -314,6 +316,7 @@ NotesUI >> insertSubMenu [
 			action: [ self insertStringAtCursor: '- [TODO]: ' ] ].
 		].
 	  
+	^ aMenu.
 ]
 
 { #category : #'Public API' }
