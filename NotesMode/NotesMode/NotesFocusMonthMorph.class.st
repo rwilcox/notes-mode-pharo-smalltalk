@@ -1,3 +1,6 @@
+"
+For hints mayyybee see SpDatePresenter? But really that just uses the underlaying CalendarMorph
+"
 Class {
 	#name : #NotesFocusMonthMorph,
 	#superclass : #CalendarMorph,

@@ -26,7 +26,7 @@ calendarPickerLayoutSpec add: #calendarNavigator.
 calendarPickerLayoutSpec add: #entryPeekText.
 
 rightSidebarLayoutSpec add: #wikiWordsList.
-"rightSidebarLayoutSpec add: calendarPickerLayoutSpec ."
+rightSidebarLayoutSpec add: calendarPickerLayoutSpec .
 "calendarPickerLayoutSpec newRow: [ :c |
 	c add: #calendarNavigator;
 	add: #entryPeekText
@@ -264,15 +264,16 @@ NotesUI >> initializeWidgets [
 	"TODO: implement me properly."
 	entryPeekText := self newText.
 	entryPeekText text: 'Scratch or focus text'.
-	"calendarAsMorph := NotesFocusMonthMorph openOn: Date today.
-	calendarNavigator := calendarAsMorph presenter.
+	
+	calendarAsMorph := NotesFocusMonthMorph openOn: Date today.
+	calendarNavigator :=  SpMorphPresenter new morph:  calendarAsMorph; yourself .
 	calendarAsMorph announcer
 		when: ChoseDate
 		do: [ :inEvent | 
 			| whatDate |
 			whatDate := inEvent date.
-			self handleDateClicked: whatDate"
-			"entryPeekText text: whatDate mmddyyyy " "]."
+			self handleDateClicked: whatDate
+			"entryPeekText text: whatDate mmddyyyy " ].
 	super initializeWidgets
 ]
 
