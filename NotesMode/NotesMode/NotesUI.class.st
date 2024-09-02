@@ -285,11 +285,14 @@ NotesUI >> insertStringAtCursor: string [
 
 	"self text accept."
 
+   self text insertAndSelectAfterCurrentSelection: string.
+	
+
+   false ifTrue: [ 
 	selectedLocation := self text getSelection.
 	currentCharacterLocation := selectedLocation first.
 
 	input := self text text.
-
 	newInput := input copyReplaceFrom: currentCharacterLocation to: (currentCharacterLocation -1) with: string.
 	"the -1 is oddball here, but it prevents out of bounds errors if we do this at the end of the text. WD-rpw 11-03-2019"
 
@@ -297,6 +300,8 @@ NotesUI >> insertStringAtCursor: string [
 	self text textArea selectFrom: currentCharacterLocation to: currentCharacterLocation + string size.
 	self text textArea scrollPane scrollSelectionIntoView.
 	"textArea = RubScrolledTextMorph. ScrollPane = RubTextScrollPane. This was seriously the easist way to reset the scrolling state. WD 10-27-2019"
+	
+  ].
 ]
 
 { #category : #'UI Builder' }

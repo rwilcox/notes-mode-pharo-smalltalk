@@ -43,7 +43,7 @@ Class {
 NotesMarkdownFileEditorWindowBase >> acceptTextEdits [
 	"comment stating purpose of message"
 
-   text editor accept.
+   "text editor accept."
 	"text accept." "TODO: do I need to do this?"
 ]
 
