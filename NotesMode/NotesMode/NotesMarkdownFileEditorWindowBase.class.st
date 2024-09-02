@@ -97,13 +97,7 @@ NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 						name: 'Jump';
 						description: 'Jump To Line';
 						action: [ self jumpToLine ] ].			
-						
-			group
-				addItem: [ :item | 
-					item
-						name: '-> Playground';
-						description: 'To Playground';
-						action: [ self sendToTextFilter  ] ].		
+							
 
 ]
 
@@ -314,10 +308,9 @@ NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
 	playground := StPlayground new.
 	playground contents: 'inText' .
 	
-	
 	"will be a StPlayground"
-	t := playground page.
-	playground setBindings: bindings.
+	t := playground page text.  "text is a SpPlaygroundInteractionModel ??"
+	"playground setBindings: bindings."
 	
 	playground openWithSpec .
 	
