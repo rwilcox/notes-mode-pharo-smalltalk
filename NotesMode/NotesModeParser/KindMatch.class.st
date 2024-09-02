@@ -9,7 +9,7 @@ Class {
 		'tags',
 		'foundInFileReference'
 	],
-	#category : #NotesMode
+	#category : #NotesModeParser
 }
 
 { #category : #accessing }

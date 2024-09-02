@@ -8,7 +8,7 @@ Class {
 		'inputLines',
 		'fileRefsForProject'
 	],
-	#category : #NotesMode
+	#category : #NotesModeParser
 }
 
 { #category : #accessing }

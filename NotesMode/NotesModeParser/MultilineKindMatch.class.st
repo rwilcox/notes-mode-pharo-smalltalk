@@ -20,7 +20,7 @@ Class {
 		'endLineStart',
 		'containingLinesArray'
 	],
-	#category : #NotesMode
+	#category : #NotesModeParser
 }
 
 { #category : #accessing }

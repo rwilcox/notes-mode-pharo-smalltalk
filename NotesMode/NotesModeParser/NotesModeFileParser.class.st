@@ -5,7 +5,7 @@ Class {
 		'inputLines',
 		'currentFileReference'
 	],
-	#category : #NotesMode
+	#category : #NotesModeParser
 }
 
 { #category : #'multi line items' }

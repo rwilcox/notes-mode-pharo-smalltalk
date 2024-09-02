@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'matches'
 	],
-	#category : #NotesMode
+	#category : #NotesModeParser
 }
 
 { #category : #'as yet unclassified' }

@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'stream'
 	],
-	#category : #NotesMode
+	#category : #NotesModeParser
 }
 
 { #category : #'as yet unclassified' }

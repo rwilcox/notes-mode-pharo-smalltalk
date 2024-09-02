@@ -4,7 +4,7 @@ A NotesModeFileParserTest is a test class for testing the behavior of NotesModeF
 Class {
 	#name : #NotesModeFileParserTest,
 	#superclass : #TestCase,
-	#category : #'NotesMode-Tests'
+	#category : #NotesModeParser
 }
 
 { #category : #'tests-accessing' }

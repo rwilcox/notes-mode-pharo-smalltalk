@@ -1,7 +1,7 @@
 Class {
 	#name : #Utils,
 	#superclass : #Object,
-	#category : #NotesMode
+	#category : #NotesModeParser
 }
 
 { #category : #'as yet unclassified' }
