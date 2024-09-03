@@ -34,7 +34,8 @@ Class {
 		'defaultFileName',
 		'defaultFolderPath',
 		'lineNumbersVisible',
-		'projectFolderReferences'
+		'projectFolderReferences',
+		'dirty'
 	],
 	#category : #NotesMode
 }
@@ -145,7 +146,7 @@ NotesMarkdownFileEditorWindowBase >> fileRefsForAllInProject [
 NotesMarkdownFileEditorWindowBase >> hasUnsavedContent [
 	"comment stating purpose of message"
 
- ^ text hasUnacceptedEdits .
+ ^ dirty. 
 ]
 
 { #category : #initialization }
@@ -153,7 +154,17 @@ NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 	"comment stating purpose of message"
 
 	text := self newText .
-
+	dirty := false.
+	
+	text whenTextChangedDo: [ 
+		dirty ifFalse: [ 
+		    self owner title: (self owner title, ' (*)').
+		    dirty := true.
+			 ]
+		 ].
+	
+	
+   "text askBeforeDiscardingEdits: true."
 	"self askOkToClose: false."
 	"self focusOrder add: text."
 	lineNumbersVisible := false.
@@ -162,6 +173,7 @@ NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 { #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> jumpToLine [
 	| whatNumber |
+	
 	whatNumber := TextEntryDialogWindow new openModal entryText asNumber.
 	self jumpToLineNumber: whatNumber
 ]
@@ -208,6 +220,8 @@ NotesMarkdownFileEditorWindowBase >> openFileFromDialog [
 				chooseFullFileNameMatching: #('*.md' '*.markdown')
 				label: nil) asFileReference ].
 	self openAndDisplayFromFileReference: openFileFileReference.
+	self owner title: (openFileFileReference basename).
+	dirty := false.
 ]
 
 { #category : #accessing }
@@ -270,6 +284,9 @@ NotesMarkdownFileEditorWindowBase >> saveFile [
    stream := ZnNewLineWriterStream on: (openFileFileReference writeStream).
 	stream << text text string.
 	stream close.
+	
+   dirty := false.
+  self owner title: (openFileFileReference basename).
 ]
 
 { #category : #'as yet unclassified' }
