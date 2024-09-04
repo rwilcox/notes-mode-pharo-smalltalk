@@ -338,7 +338,7 @@ NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
 
 { #category : #'UI Builder' }
 NotesUI >> listSubMenu [
-	^ MenuModel new addGroup: [ :group |
+	^ SpMenuPresenter new addGroup: [ :group |
 		group addItem: [ :item |
 			item name: 'TODOs';
 			action: [ self displayTodoItems ].
