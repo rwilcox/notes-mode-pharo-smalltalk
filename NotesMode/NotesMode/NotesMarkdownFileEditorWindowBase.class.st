@@ -155,6 +155,14 @@ NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 	"comment stating purpose of message"
 
 	text := self newText .
+	text withAdapterDo: [ :anAdaptor |
+		anAdaptor grow: false
+		 ].
+	"do not want this growing, plus causes performance degradation with multi thousand line files
+	RubScrolledTextMorph turns this on, we don't want that actually, thank you
+	See also: https://github.com/pharo-project/pharo/pull/11583
+	WD-rpw 09/03/2024"
+	
 	dirty := false.
 	
 	text whenTextChangedDo: [ 
