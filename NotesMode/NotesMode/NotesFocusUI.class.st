@@ -1,6 +1,6 @@
 Class {
 	#name : #NotesFocusUI,
-	#superclass : #ComposableModel,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'text',
 		'parentNotesUI'
@@ -14,11 +14,8 @@ NotesFocusUI class >> defaultSpec [
 
 <spec: #default>
 	| bodyLayoutSpec |
-	bodyLayoutSpec := SpecLayout composed.
-	bodyLayoutSpec
-		newRow: [ :c | 
-			c
-				add: #text. ].
+	bodyLayoutSpec := SpBoxLayout newVertical .
+	bodyLayoutSpec add: #text.
 			
 		^ bodyLayoutSpec .
 ]
@@ -32,7 +29,7 @@ NotesFocusUI class >> example [
 NotesFocusUI >> initializeWidgets [
 	"comment stating purpose of message"
 
-	text := TextModel new. 
+	text := self newText.
 	text whenBuiltDo: [  :w | w widget font: (LogicalFont familyName: 'Source Sans Pro' pointSize: 16) ].
 	self focusOrder add: text.
 	
@@ -55,10 +52,10 @@ NotesFocusUI >> parentNotesUI: anObject [
 NotesFocusUI >> sentFocusContentsToParent [
 	"comment stating purpose of message"
 
-self text accept.
+"self text accept."
 
 self parentNotesUI ifNotNil: [ 
-	self parentNotesUI insertStringAtCursor:  ((self text getText string), String cr). 
+	self parentNotesUI insertStringAtCursor:  ((self text text), String cr). 
 	"cast it to a string, not text, to remove formatting. RPW 07/27/2019"
 	].
 ]
