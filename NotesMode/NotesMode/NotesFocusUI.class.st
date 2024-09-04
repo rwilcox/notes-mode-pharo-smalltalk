@@ -8,6 +8,14 @@ Class {
 	#category : #NotesMode
 }
 
+{ #category : #layout }
+NotesFocusUI class >> defaultLayout [
+	"comment stating purpose of class-side method"
+	"scope: class-variables  &  class-instance-variables"
+
+	^ self defaultSpec.
+]
+
 { #category : #specs }
 NotesFocusUI class >> defaultSpec [
 	"comment stating purpose of message"
@@ -22,7 +30,7 @@ NotesFocusUI class >> defaultSpec [
 
 { #category : #example }
 NotesFocusUI class >> example [
-	^ self new openWithSpec.
+	^ self new open.
 ]
 
 { #category : #initialization }

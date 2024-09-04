@@ -13,6 +13,14 @@ Class {
 	#category : #NotesMode
 }
 
+{ #category : #layout }
+NotesUI class >> defaultLayout [
+	"comment stating purpose of class-side method"
+	"scope: class-variables  &  class-instance-variables"
+
+	^ self defaultSpec .
+]
+
 { #category : #specs }
 NotesUI class >> defaultSpec [
 	<spec: #default>
@@ -60,7 +68,11 @@ rightSidebarLayoutSpec add: calendarPickerLayoutSpec .
 
 { #category : #example }
 NotesUI class >> example [
-	^ self new openWithSpec.
+   |output|
+   output := self new.
+
+   "output layout: #defaultSpec.	"
+	^ output open  .
 ]
 
 { #category : #specs }
@@ -408,7 +420,7 @@ NotesUI >> spawnFocusWindow [
 	|f|
 	f := NotesFocusUI new.
 	f parentNotesUI: self.
-	f openWithSpec.
+	f open.
 	
 ]
 
