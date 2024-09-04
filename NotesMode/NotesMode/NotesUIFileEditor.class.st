@@ -19,15 +19,16 @@ Internal Representation and Key Implementation Points.
     Implementation Points
 "
 Class {
-	#name : #NotesUIFileEditor,
-	#superclass : #NotesMarkdownFileEditorWindowBase,
+	#name : 'NotesUIFileEditor',
+	#superclass : 'NotesMarkdownFileEditorWindowBase',
 	#instVars : [
 		'menu'
 	],
-	#category : #NotesMode
+	#category : 'NotesMode',
+	#package : 'NotesMode'
 }
 
-{ #category : #specs }
+{ #category : 'specs' }
 NotesUIFileEditor class >> defaultSpec [
 	<spec: #default>
 
@@ -40,12 +41,12 @@ NotesUIFileEditor class >> defaultSpec [
 		yourself
 ]
 
-{ #category : #example }
+{ #category : 'example' }
 NotesUIFileEditor class >> example [
 	^ self new openWithSpec.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 NotesUIFileEditor >> initializeWidgets [
    |cMenu|
    cMenu := self newMenuBar.
@@ -58,12 +59,12 @@ NotesUIFileEditor >> initializeWidgets [
 	super initializeWidgets .
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUIFileEditor >> menu [
 	^ menu
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUIFileEditor >> menu: anObject [
 	menu := anObject
 ]

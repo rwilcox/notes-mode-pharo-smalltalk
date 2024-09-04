@@ -1,6 +1,6 @@
 Class {
-	#name : #NotesUI,
-	#superclass : #NotesMarkdownFileEditorWindowBase,
+	#name : 'NotesUI',
+	#superclass : 'NotesMarkdownFileEditorWindowBase',
 	#instVars : [
 		'menu',
 		'wikiWordsList',
@@ -10,10 +10,11 @@ Class {
 		'currentlyListedKindMatches',
 		'clearAllDeskAccessories'
 	],
-	#category : #NotesMode
+	#category : 'NotesMode',
+	#package : 'NotesMode'
 }
 
-{ #category : #layout }
+{ #category : 'layout' }
 NotesUI class >> defaultLayout [
 	"comment stating purpose of class-side method"
 	"scope: class-variables  &  class-instance-variables"
@@ -21,7 +22,7 @@ NotesUI class >> defaultLayout [
 	^ self defaultSpec .
 ]
 
-{ #category : #specs }
+{ #category : 'specs' }
 NotesUI class >> defaultSpec [
 	<spec: #default>
 	| bodyLayoutSpec rightSidebarLayoutSpec calendarPickerLayoutSpec res rLayout|
@@ -66,7 +67,7 @@ rightSidebarLayoutSpec add: calendarPickerLayoutSpec .
 	^ rLayout.
 ]
 
-{ #category : #example }
+{ #category : 'example' }
 NotesUI class >> example [
    |output|
    output := self new.
@@ -75,7 +76,7 @@ NotesUI class >> example [
 	^ output open  .
 ]
 
-{ #category : #specs }
+{ #category : 'specs' }
 NotesUI class >> layoutWithoutDeskAccessories [
   <spec:#withoutDAs>
 
@@ -87,7 +88,7 @@ NotesUI class >> layoutWithoutDeskAccessories [
 	^ bodyLayoutSpec .		
 ]
 
-{ #category : #'Public API' }
+{ #category : 'Public API' }
 NotesUI >> appendText: itText [
 	"comment stating purpose of message"
 
@@ -98,27 +99,27 @@ self text accept.  "need to do this to refresh the model with the pending text. 
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> calendarNavigator [
 	^ calendarNavigator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> calendarNavigator: anObject [
 	calendarNavigator := anObject
 ]
 
-{ #category : #'Public API' }
+{ #category : 'Public API' }
 NotesUI >> currentlyListedKindMatches [
 	^ currentlyListedKindMatches
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> currentlyListedKindMatches: anObject [
 	currentlyListedKindMatches := anObject
 ]
 
-{ #category : #'UI adaptors' }
+{ #category : 'UI adaptors' }
 NotesUI >> displayMultipleLinesofType: aString [
 	"a hack method until we make this better..."
 
@@ -140,7 +141,7 @@ NotesUI >> displayMultipleLinesofType: aString [
 	"wikiWordsList refreshListItems ."
 ]
 
-{ #category : #'UI adaptors' }
+{ #category : 'UI adaptors' }
 NotesUI >> displaySingleLinesOfType: aString [
 	| listItems tmp |
 	listItems := OrderedCollection new.
@@ -155,12 +156,12 @@ NotesUI >> displaySingleLinesOfType: aString [
 	"wikiWordsList refreshListItems"
 ]
 
-{ #category : #'UI adaptors' }
+{ #category : 'UI adaptors' }
 NotesUI >> displayTodoItems [
 	self displaySingleLinesOfType: 'TODO'.
 ]
 
-{ #category : #'UI adaptors' }
+{ #category : 'UI adaptors' }
 NotesUI >> displayWikiWords [
 	"read and display wiki words for this item in our list"
 
@@ -179,17 +180,17 @@ NotesUI >> displayWikiWords [
 	"wikiWordsList refreshListItems."
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> entryPeekText [
 	^ entryPeekText
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> entryPeekText: anObject [
 	entryPeekText := anObject
 ]
 
-{ #category : #'Model Related' }
+{ #category : 'Model Related' }
 NotesUI >> getLogEntriesByDate [
 	"comment stating purpose of message"
 
@@ -200,14 +201,14 @@ NotesUI >> getLogEntriesByDate [
 	^ p matchesForImplicitDayEntry
 ]
 
-{ #category : #'UI adaptors' }
+{ #category : 'UI adaptors' }
 NotesUI >> handleDateClicked: whatDate [
 	(dateWorkEntriesCache includesKey: whatDate) 
 	ifTrue: [ entryPeekText text: ( (dateWorkEntriesCache at: whatDate) textLines ) ] 
 	ifFalse: [ entryPeekText text: 'no entry for this date found' ].
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 NotesUI >> handleEntityListClickOn: selectedInfo [
 	| numberLocation txtLineSplits fileName otherFileNotesMode fileRefIndex fileRefToZoomInto a txtLine|
 	txtLine := selectedInfo selectedItem.
@@ -240,7 +241,7 @@ NotesUI >> handleEntityListClickOn: selectedInfo [
 	].
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 NotesUI >> handleToggleDeskAccessories [
 	"by default we have lots of desk accessories: a calendar, scratch text, entity view.
 	Sometimes the user doesn't want all that. (Sometimes they do)"
@@ -259,37 +260,41 @@ NotesUI >> handleToggleDeskAccessories [
 	self replaceLayoutWith:  newLayout
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 NotesUI >> initializeWidgets [
 	"comment stating purpose of message"
 
 	| calendarAsMorph |
-   menu := self newMenuBar 
-		addGroup: [ :group | 
-			super addStandardToolbarItemsTo: group.
-			self setOurToolbarItemsTo: group ].
+	menu := self newMenuBar addGroup: [ :group |
+		        super addStandardToolbarItemsTo: group.
+		        self setOurToolbarItemsTo: group ].
 	"menu applyTo: self."
-	wikiWordsList := self newList.	 "a ListModel"
-	wikiWordsList items: {'entity list'}.
-	wikiWordsList whenActivatedDo:  [ :txtLine | self handleEntityListClickOn: txtLine ].
+	wikiWordsList := self newList. "a ListModel"
+	wikiWordsList items: { 'entity list' }.
+	wikiWordsList whenActivatedDo: [ :txtLine |
+		self handleEntityListClickOn: txtLine ].
 
 	"TODO: implement me properly."
+	
 	entryPeekText := self newText.
 	entryPeekText text: 'Scratch or focus text'.
-	
+
 	calendarAsMorph := NotesFocusMonthMorph openOn: Date today.
-	calendarNavigator :=  SpMorphPresenter new morph:  calendarAsMorph; yourself .
+	calendarNavigator := SpMorphPresenter new
+		                     morph: calendarAsMorph;
+		                     yourself.
 	calendarAsMorph announcer
 		when: ChoseDate
-		do: [ :inEvent | 
+		do: [ :inEvent |
 			| whatDate |
 			whatDate := inEvent date.
 			self handleDateClicked: whatDate
-			"entryPeekText text: whatDate mmddyyyy " ].
+			"entryPeekText text: whatDate mmddyyyy " ]
+		for: self.
 	super initializeWidgets
 ]
 
-{ #category : #'Public API' }
+{ #category : 'Public API' }
 NotesUI >> insertStringAtCursor: string [
 	"comment stating purpose of message"
 
@@ -316,7 +321,7 @@ NotesUI >> insertStringAtCursor: string [
   ].
 ]
 
-{ #category : #'UI Builder' }
+{ #category : 'UI Builder' }
 NotesUI >> insertSubMenu [
 "thanks very much to the ApplicationWithToolbar Spec-Example, in the image"
    |aMenu|
@@ -337,7 +342,7 @@ NotesUI >> insertSubMenu [
 	^ aMenu.
 ]
 
-{ #category : #'Public API' }
+{ #category : 'Public API' }
 NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
 	| p |
 	
@@ -348,7 +353,7 @@ NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
 		excludeCompleted: exclude
 ]
 
-{ #category : #'UI Builder' }
+{ #category : 'UI Builder' }
 NotesUI >> listSubMenu [
 	^ SpMenuPresenter new addGroup: [ :group |
 		group addItem: [ :item |
@@ -374,23 +379,23 @@ NotesUI >> listSubMenu [
 	 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> menu [
 	^ menu
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> menu: anObject [
 	menu := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 NotesUI >> openFileFromDialog [
 	super openFileFromDialog .
 	dateWorkEntriesCache := self getLogEntriesByDate.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 NotesUI >> setOurToolbarItemsTo: group [
 group
 				addItem: [ :item | 
@@ -415,7 +420,7 @@ group
 						 ].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 NotesUI >> spawnFocusWindow [
 	|f|
 	f := NotesFocusUI new.
@@ -424,12 +429,12 @@ NotesUI >> spawnFocusWindow [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> wikiWordsList [
 	^ wikiWordsList
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NotesUI >> wikiWordsList: anObject [
 	wikiWordsList := anObject
 ]

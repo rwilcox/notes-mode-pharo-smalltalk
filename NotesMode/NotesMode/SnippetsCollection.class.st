@@ -1,10 +1,11 @@
 Class {
-	#name : #SnippetsCollection,
-	#superclass : #Object,
-	#category : #NotesMode
+	#name : 'SnippetsCollection',
+	#superclass : 'Object',
+	#category : 'NotesMode',
+	#package : 'NotesMode'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 SnippetsCollection >> meetingSnippet [
 	^ '### - [MEETING]: ', String cr, String cr, String cr, 
 	'| Document                                   | Link                               |', String cr,
@@ -15,7 +16,7 @@ SnippetsCollection >> meetingSnippet [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 SnippetsCollection >> worklogSnippet [
 	"comment stating purpose of message"
 
