@@ -1,1 +1,1 @@
-Package { #name : 'NotesMode' }
+Package { #name : #NotesMode }

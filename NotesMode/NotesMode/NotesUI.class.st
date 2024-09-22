@@ -1,6 +1,6 @@
 Class {
-	#name : 'NotesUI',
-	#superclass : 'NotesMarkdownFileEditorWindowBase',
+	#name : #NotesUI,
+	#superclass : #NotesMarkdownFileEditorWindowBase,
 	#instVars : [
 		'menu',
 		'wikiWordsList',
@@ -10,11 +10,10 @@ Class {
 		'currentlyListedKindMatches',
 		'clearAllDeskAccessories'
 	],
-	#category : 'NotesMode',
-	#package : 'NotesMode'
+	#category : #NotesMode
 }
 
-{ #category : 'layout' }
+{ #category : #layout }
 NotesUI class >> defaultLayout [
 	"comment stating purpose of class-side method"
 	"scope: class-variables  &  class-instance-variables"
@@ -22,7 +21,7 @@ NotesUI class >> defaultLayout [
 	^ self defaultSpec .
 ]
 
-{ #category : 'specs' }
+{ #category : #specs }
 NotesUI class >> defaultSpec [
 	<spec: #default>
 	| bodyLayoutSpec rightSidebarLayoutSpec calendarPickerLayoutSpec res rLayout|
@@ -67,7 +66,7 @@ rightSidebarLayoutSpec add: calendarPickerLayoutSpec .
 	^ rLayout.
 ]
 
-{ #category : 'example' }
+{ #category : #example }
 NotesUI class >> example [
    |output|
    output := self new.
@@ -76,7 +75,7 @@ NotesUI class >> example [
 	^ output open  .
 ]
 
-{ #category : 'specs' }
+{ #category : #specs }
 NotesUI class >> layoutWithoutDeskAccessories [
   <spec:#withoutDAs>
 
@@ -88,7 +87,7 @@ NotesUI class >> layoutWithoutDeskAccessories [
 	^ bodyLayoutSpec .		
 ]
 
-{ #category : 'Public API' }
+{ #category : #'Public API' }
 NotesUI >> appendText: itText [
 	"comment stating purpose of message"
 
@@ -99,98 +98,72 @@ self text accept.  "need to do this to refresh the model with the pending text. 
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> calendarNavigator [
 	^ calendarNavigator
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> calendarNavigator: anObject [
 	calendarNavigator := anObject
 ]
 
-{ #category : 'Public API' }
+{ #category : #'Public API' }
 NotesUI >> currentlyListedKindMatches [
 	^ currentlyListedKindMatches
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> currentlyListedKindMatches: anObject [
 	currentlyListedKindMatches := anObject
 ]
 
-{ #category : 'UI adaptors' }
+{ #category : #'UI adaptors' }
 NotesUI >> displayMultipleLinesofType: aString [
 	"a hack method until we make this better..."
 
-	| stream listItems tmp |
-
+	| listItems tmp |
+	"TODO: right function here?""wikiWordsList refreshListItems ."
+	tmp := self getMultipleLinesOfType: aString.
 	listItems := OrderedCollection new.
-
-	stream := LineByLineStream new.
-	stream stream: self openFileReadStream.
-
-  tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
-  "TODO: right function here?"
-
 	self currentlyListedKindMatches: tmp.
-	
-	tmp do: [ :current | listItems add: current lineText , ' |||| ' , current lineNumber asString, ' |||| ', current foundInFileReference basename ].
-
-	wikiWordsList items: listItems.
-	"wikiWordsList refreshListItems ."
+	listItems := self setEntityListTo: tmp
 ]
 
-{ #category : 'UI adaptors' }
+{ #category : #'UI adaptors' }
 NotesUI >> displaySingleLinesOfType: aString [
-	| listItems tmp |
-	listItems := OrderedCollection new.
+	| tmp |
 	tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
 	
-	self currentlyListedKindMatches: tmp.
-	tmp
-		do: [ :current | 
-			listItems
-				add: current lineText , ' |||| ' , current lineNumber asString, ' |||| ', current foundInFileReference basename].
-	wikiWordsList items: listItems.
-	"wikiWordsList refreshListItems"
+	self setEntityListTo: tmp.
 ]
 
-{ #category : 'UI adaptors' }
+{ #category : #'UI adaptors' }
 NotesUI >> displayTodoItems [
 	self displaySingleLinesOfType: 'TODO'.
 ]
 
-{ #category : 'UI adaptors' }
+{ #category : #'UI adaptors' }
 NotesUI >> displayWikiWords [
 	"read and display wiki words for this item in our list"
 
-	| p listItems |
-
-	p := NotesModeProjectParser new.
-	p populateProjectFileReferencesFromArray: self fileRefsForAllInProject  .
-	listItems := OrderedCollection new.
-
-	(p matchesForImplicitWikiWords)
-		do: [ :current | 
-			listItems add: current lineText , ' |||| ' , current lineNumber asString,  ' |||| ', current foundInFileReference basename
-		].
-
-	wikiWordsList items: listItems.
+	| listItems |
 	"wikiWordsList refreshListItems."
+	listItems := self getWikiWords.
+	wikiWordsList items: listItems
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> entryPeekText [
 	^ entryPeekText
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> entryPeekText: anObject [
 	entryPeekText := anObject
 ]
 
-{ #category : 'Model Related' }
+{ #category : #'Model Related' }
 NotesUI >> getLogEntriesByDate [
 	"comment stating purpose of message"
 
@@ -201,14 +174,52 @@ NotesUI >> getLogEntriesByDate [
 	^ p matchesForImplicitDayEntry
 ]
 
-{ #category : 'UI adaptors' }
+{ #category : #'UI adaptors' }
+NotesUI >> getMultipleLinesOfType: aString [
+   "the string is the kind of Notes entity"
+	| stream tmp|
+
+	stream := LineByLineStream new.
+	stream stream: self openFileReadStream.
+
+	tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
+	"TODO: right function here?"
+
+   ^ tmp.
+]
+
+{ #category : #'as yet unclassified' }
+NotesUI >> getSingleLinesOfType: tmp [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+	^ self kindMatchesForKindInModel:  tmp excludeCompleted: true.
+]
+
+{ #category : #'UI adaptors' }
+NotesUI >> getWikiWords [
+
+	| p listItems |
+	p := NotesModeProjectParser new.
+	p populateProjectFileReferencesFromArray:
+		self fileRefsForAllInProject.
+	listItems := OrderedCollection new.
+
+	p matchesForImplicitWikiWords do: [ :current |
+		listItems add:
+			current lineText , ' |||| ' , current lineNumber asString
+			, ' |||| ' , current foundInFileReference basename ].
+	^ listItems
+]
+
+{ #category : #'UI adaptors' }
 NotesUI >> handleDateClicked: whatDate [
 	(dateWorkEntriesCache includesKey: whatDate) 
 	ifTrue: [ entryPeekText text: ( (dateWorkEntriesCache at: whatDate) textLines ) ] 
 	ifFalse: [ entryPeekText text: 'no entry for this date found' ].
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 NotesUI >> handleEntityListClickOn: selectedInfo [
 	| numberLocation txtLineSplits fileName otherFileNotesMode fileRefIndex fileRefToZoomInto a txtLine|
 	txtLine := selectedInfo selectedItem.
@@ -241,7 +252,7 @@ NotesUI >> handleEntityListClickOn: selectedInfo [
 	].
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 NotesUI >> handleToggleDeskAccessories [
 	"by default we have lots of desk accessories: a calendar, scratch text, entity view.
 	Sometimes the user doesn't want all that. (Sometimes they do)"
@@ -260,7 +271,7 @@ NotesUI >> handleToggleDeskAccessories [
 	self replaceLayoutWith:  newLayout
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 NotesUI >> initializeWidgets [
 	"comment stating purpose of message"
 
@@ -294,7 +305,7 @@ NotesUI >> initializeWidgets [
 	super initializeWidgets
 ]
 
-{ #category : 'Public API' }
+{ #category : #'Public API' }
 NotesUI >> insertStringAtCursor: string [
 	"comment stating purpose of message"
 
@@ -321,7 +332,7 @@ NotesUI >> insertStringAtCursor: string [
   ].
 ]
 
-{ #category : 'UI Builder' }
+{ #category : #'UI Builder' }
 NotesUI >> insertSubMenu [
 "thanks very much to the ApplicationWithToolbar Spec-Example, in the image"
    |aMenu|
@@ -342,7 +353,7 @@ NotesUI >> insertSubMenu [
 	^ aMenu.
 ]
 
-{ #category : 'Public API' }
+{ #category : #'Public API' }
 NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
 	| p |
 	
@@ -353,7 +364,7 @@ NotesUI >> kindMatchesForKindInModel: aString excludeCompleted: exclude [
 		excludeCompleted: exclude
 ]
 
-{ #category : 'UI Builder' }
+{ #category : #'UI Builder' }
 NotesUI >> listSubMenu [
 	^ SpMenuPresenter new addGroup: [ :group |
 		group addItem: [ :item |
@@ -379,23 +390,37 @@ NotesUI >> listSubMenu [
 	 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> menu [
 	^ menu
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> menu: anObject [
 	menu := anObject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesUI >> openFileFromDialog [
 	super openFileFromDialog .
 	dateWorkEntriesCache := self getLogEntriesByDate.
 ]
 
-{ #category : 'initialization' }
+{ #category : #'UI adaptors' }
+NotesUI >> setEntityListTo: tmp [
+   "takes a Collection of KindMatches, formats them per standard and adds them to the entity list"
+
+	| listItems |
+	listItems := tmp collect: [ :current |
+		             current lineText , ' |||| '
+		             , current lineNumber asString , ' |||| '
+		             , current foundInFileReference basename ].
+
+	wikiWordsList items: listItems.
+	^ listItems
+]
+
+{ #category : #initialization }
 NotesUI >> setOurToolbarItemsTo: group [
 group
 				addItem: [ :item | 
@@ -420,7 +445,7 @@ group
 						 ].
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesUI >> spawnFocusWindow [
 	|f|
 	f := NotesFocusUI new.
@@ -429,12 +454,12 @@ NotesUI >> spawnFocusWindow [
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> wikiWordsList [
 	^ wikiWordsList
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesUI >> wikiWordsList: anObject [
 	wikiWordsList := anObject
 ]

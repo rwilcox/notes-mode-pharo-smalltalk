@@ -26,8 +26,8 @@ Internal Representation and Key Implementation Points.
     Implementation Points
 "
 Class {
-	#name : 'NotesMarkdownFileEditorWindowBase',
-	#superclass : 'SpPresenter',
+	#name : #NotesMarkdownFileEditorWindowBase,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'openFileFileReference',
 		'text',
@@ -37,11 +37,33 @@ Class {
 		'projectFolderReferences',
 		'dirty'
 	],
-	#category : 'NotesMode',
-	#package : 'NotesMode'
+	#classVars : [
+		'notesWindowList'
+	],
+	#category : #NotesMode
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : #adding }
+NotesMarkdownFileEditorWindowBase class >> addToNotesWindowList: item [
+	"comment stating purpose of class-side method"
+	"scope: class-variables  &  class-instance-variables"
+
+	"TODO: obviously a bug here when you go to close one of these things, 
+	I'll implement that if / when I have to. WD-rpw 09-21-2024"
+	
+	notesWindowList ifNil: [  notesWindowList := OrderedCollection new ].
+	
+	notesWindowList add: item.
+]
+
+{ #category : #'as yet unclassified' }
+NotesMarkdownFileEditorWindowBase class >> notesWindowList [
+	"An OrderedCollection that contains every NotesMode window open. Useful to query or set attributes of the current window"
+
+	^ notesWindowList .
+]
+
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> acceptTextEdits [
 	"comment stating purpose of message"
 
@@ -49,7 +71,7 @@ NotesMarkdownFileEditorWindowBase >> acceptTextEdits [
 	"text accept." "TODO: do I need to do this?"
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 	group
 				addItem: [ :item | 
@@ -103,27 +125,27 @@ NotesMarkdownFileEditorWindowBase >> addStandardToolbarItemsTo: group [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> defaultFileName [
 	^ defaultFileName
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> defaultFileName: anObject [
 	defaultFileName := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> defaultFolderPath [
 	^ defaultFolderPath
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> defaultFolderPath: anObject [
 	defaultFolderPath := anObject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> fileParser [
 	|output|
 	
@@ -133,7 +155,7 @@ NotesMarkdownFileEditorWindowBase >> fileParser [
   ^ output.
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> fileRefsForAllInProject [
   |fileRefsForProject|
   fileRefsForProject := Array new.
@@ -143,14 +165,14 @@ NotesMarkdownFileEditorWindowBase >> fileRefsForAllInProject [
 	^ { openFileFileReference } , fileRefsForProject.
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> hasUnsavedContent [
 	"comment stating purpose of message"
 
  ^ dirty. 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 	"comment stating purpose of message"
 
@@ -177,9 +199,11 @@ NotesMarkdownFileEditorWindowBase >> initializeWidgets [
 	"self askOkToClose: false."
 	"self focusOrder add: text."
 	lineNumbersVisible := false.
+	
+   NotesMarkdownFileEditorWindowBase addToNotesWindowList: self.
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> jumpToLine [
 	| whatNumber |
 	
@@ -187,7 +211,7 @@ NotesMarkdownFileEditorWindowBase >> jumpToLine [
 	self jumpToLineNumber: whatNumber
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> jumpToLineNumber: whatNumber [
 	| startIndex correspondingRes stopIndex txtModel scrollPane txtStr|
 	
@@ -203,7 +227,7 @@ NotesMarkdownFileEditorWindowBase >> jumpToLineNumber: whatNumber [
 	"GrowlMorph openWithLabel: 'NotesMode' contents: 'could not goto line number (method not defined right now)'"
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> openAndDisplayFromFileReference: ref [
 	| stream str |
 	openFileFileReference := ref.
@@ -214,7 +238,7 @@ NotesMarkdownFileEditorWindowBase >> openAndDisplayFromFileReference: ref [
 	"text hasUnacceptedEdits: false"
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> openFileFromDialog [
 	| uim |
 	uim := UIManager default.
@@ -233,21 +257,21 @@ NotesMarkdownFileEditorWindowBase >> openFileFromDialog [
 	dirty := false.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> openFileReadStream [
 	"Will always return a readStream, set to 0, of the current file"
 
 	^ openFileFileReference readStream
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> openFindDialog [
    text doTextFind .
 	"(text textArea) textArea announce: RubFindReplaceWindowRequired ."
 "^^^ yes really, textArea is like the scollableTextMorph, we want the actual textmoph inside that..."
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> openFolderFromDialog [
 	"comment stating purpose of instance-side message"
 
@@ -272,7 +296,7 @@ NotesMarkdownFileEditorWindowBase >> openFolderFromDialog [
 
 ]
 
-{ #category : 'Model Related' }
+{ #category : #'Model Related' }
 NotesMarkdownFileEditorWindowBase >> readStreamsForAllInProject [
 
   ^ self fileRefsForAllInProject collect: [ :currentFileReference |
@@ -281,7 +305,7 @@ NotesMarkdownFileEditorWindowBase >> readStreamsForAllInProject [
 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> saveFile [
 	| stream |
 
@@ -298,7 +322,7 @@ NotesMarkdownFileEditorWindowBase >> saveFile [
   self owner title: (openFileFileReference basename).
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> saveFileFromDialog [
 	"the create new file version of openFileFromDialog"	
 			
@@ -310,12 +334,12 @@ NotesMarkdownFileEditorWindowBase >> saveFileFromDialog [
 	
 ]
 
-{ #category : 'scrolling' }
+{ #category : #scrolling }
 NotesMarkdownFileEditorWindowBase >> scrollDown: clicksWorth [
 	self text textArea scrollPane vScrollbar scrollDown: clicksWorth .  "= clicking mouse  button X times"
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
 	"take the current selection and send it as an attribute of a new Playground"
 
@@ -343,17 +367,17 @@ NotesMarkdownFileEditorWindowBase >> sendToTextFilter [
 "TODO: fix me!!"
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> text [
 	^ text
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesMarkdownFileEditorWindowBase >> text: anObject [
 	text := anObject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> turnOffLineNumbers [
 	"comment stating purpose of message"
 
@@ -362,7 +386,7 @@ self text adapter widget withoutLineNumbers .
 lineNumbersVisible := false.
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> turnOnLineNumbers [
 
 self text adapter widget withLineNumbers .
@@ -371,7 +395,7 @@ lineNumbersVisible := true.
 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesMarkdownFileEditorWindowBase >> windowIsClosing [
 	"called from SpecWindow (SystemWindow) delete.
 

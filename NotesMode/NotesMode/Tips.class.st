@@ -1,11 +1,10 @@
 Class {
-	#name : 'Tips',
-	#superclass : 'Object',
-	#category : 'NotesMode',
-	#package : 'NotesMode'
+	#name : #Tips,
+	#superclass : #Object,
+	#category : 'NotesMode'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 Tips class >> tipsAndInformation [
 	"comment stating purpose of message"
 

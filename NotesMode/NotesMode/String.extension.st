@@ -1,6 +1,6 @@
-Extension { #name : 'String' }
+Extension { #name : #String }
 
-{ #category : '*NotesMode' }
+{ #category : #'*NotesMode' }
 String >> indexCorrespendingToLineNumber: lineNum [
 	"comment stating purpose of message"
 

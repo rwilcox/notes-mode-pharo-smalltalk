@@ -1,15 +1,14 @@
 Class {
-	#name : 'NotesFocusUI',
-	#superclass : 'SpPresenter',
+	#name : #NotesFocusUI,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'text',
 		'parentNotesUI'
 	],
-	#category : 'NotesMode',
-	#package : 'NotesMode'
+	#category : 'NotesMode'
 }
 
-{ #category : 'layout' }
+{ #category : #layout }
 NotesFocusUI class >> defaultLayout [
 	"comment stating purpose of class-side method"
 	"scope: class-variables  &  class-instance-variables"
@@ -17,7 +16,7 @@ NotesFocusUI class >> defaultLayout [
 	^ self defaultSpec.
 ]
 
-{ #category : 'specs' }
+{ #category : #specs }
 NotesFocusUI class >> defaultSpec [
 	"comment stating purpose of message"
 
@@ -29,12 +28,12 @@ NotesFocusUI class >> defaultSpec [
 		^ bodyLayoutSpec .
 ]
 
-{ #category : 'example' }
+{ #category : #example }
 NotesFocusUI class >> example [
 	^ self new open.
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 NotesFocusUI >> initializeWidgets [
 	"comment stating purpose of message"
 
@@ -47,17 +46,17 @@ self whenWindowChanged: [
 ].
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesFocusUI >> parentNotesUI [
 	^ parentNotesUI
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesFocusUI >> parentNotesUI: anObject [
 	parentNotesUI := anObject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 NotesFocusUI >> sentFocusContentsToParent [
 	"comment stating purpose of message"
 
@@ -69,12 +68,12 @@ self parentNotesUI ifNotNil: [
 	].
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesFocusUI >> text [
 	^ text
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 NotesFocusUI >> text: anObject [
 	text := anObject
 ]
