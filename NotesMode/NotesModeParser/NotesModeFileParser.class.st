@@ -205,7 +205,7 @@ NotesModeFileParser >> isWikiWordLine: line [
 	"comment stating purpose of message"
 
 	| regexPatternWikiWord |
-	regexPatternWikiWord := '^.*<<([A-Za-z_0-9]+)>>.*'.
+	regexPatternWikiWord := '^.*<<([A-Za-z_0-9\-]+)>>.*'.
 	^ line matchesRegex: regexPatternWikiWord
 ]
 

@@ -201,3 +201,13 @@ NotesModeFileParserTest >> testMultilineEntriesFindsWhenPeerOfTheItemIsFound [
 	A line here
 	'
 ]
+
+{ #category : #tests }
+NotesModeFileParserTest >> testWikiWordsAndDashes [
+	"comment stating purpose of message"
+
+	| nm res |
+	nm := NotesModeFileParser new.
+	res := nm isWikiWordLine: '# <<Ryan-Wilcox>>'.
+	self should: res.
+]
