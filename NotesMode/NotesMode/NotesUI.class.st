@@ -216,7 +216,10 @@ NotesUI >> getWikiWords [
 NotesUI >> handleDateClicked: whatDate [
 	(dateWorkEntriesCache includesKey: whatDate) 
 	ifTrue: [ entryPeekText text: ( (dateWorkEntriesCache at: whatDate) textLines ) ] 
-	ifFalse: [ entryPeekText text: 'no entry for this date found' ].
+	ifFalse: [ 
+		dateWorkEntriesCache := self getLogEntriesByDate.
+		entryPeekText text: 'no entry for this date found. Cache has been refreshed, try again.'
+    ].
 ]
 
 { #category : #initialization }
