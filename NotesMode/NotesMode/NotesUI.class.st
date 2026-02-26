@@ -176,13 +176,21 @@ NotesUI >> getLogEntriesByDate [
 
 { #category : #'UI adaptors' }
 NotesUI >> getMultipleLinesOfType: aString [
-   "the string is the kind of Notes entity"
+  ^ self getMultipleLinesOfType:  aString excludeCompleted: true.
+]
+
+{ #category : #'as yet unclassified' }
+NotesUI >> getMultipleLinesOfType: typeString excludeCompleted: hideCompleted [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+ "the string is the kind of Notes entity"
 	| stream tmp|
 
 	stream := LineByLineStream new.
 	stream stream: self openFileReadStream.
 
-	tmp := self kindMatchesForKindInModel: aString excludeCompleted: true.
+	tmp := self kindMatchesForKindInModel: typeString excludeCompleted: hideCompleted.
 	"TODO: right function here?"
 
    ^ tmp.
